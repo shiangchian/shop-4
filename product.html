@@ -1,299 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品介紹 - 得正 dejeng</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f8; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .navbar { background: #B0E0E6; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .navbar-container { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .navbar-logo { display: flex; align-items: center; font-size: 1.5rem; font-weight: bold; color: #2F4F4F; text-decoration: none; }
+        .navbar-logo .logo { width: 40px; height: 40px; margin-right: 10px; }
+        .navbar-menu { display: flex; list-style: none; gap: 20px; align-items: center; }
+        .navbar-menu a { text-decoration: none; color: #2F4F4F; font-weight: 500; transition: color 0.3s ease; }
+        .navbar-menu a:hover { color: #4682B4; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f4f6f8;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        .product-page-wrapper { flex: 1; padding: 4rem 2rem; display: flex; justify-content: center; align-items: center; }
+        .product-detail-container { 
+            background: white; max-width: 1000px; width: 100%; border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08); display: flex; overflow: hidden; position: relative;
         }
+        .breadcrumb { position: absolute; top: 20px; left: 30px; font-size: 0.9rem; color: #888; }
+        .breadcrumb a { color: #48C9B0; text-decoration: none; }
+        
+        .image-section { flex: 1; background: linear-gradient(135deg, #E0F6FF 0%, #B0E0E6 100%); padding: 4rem; display: flex; justify-content: center; align-items: center; }
+        .image-section img { width: 100%; max-width: 350px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); transition: transform 0.3s ease; }
+        .image-section img:hover { transform: scale(1.03); }
 
-        .navbar {
-            background: #B0E0E6;
-            padding: 10px 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+        .info-section { flex: 1; padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; }
+        .badge { display: inline-block; background: #FF6B6B; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }
+        .pd-title { font-size: 2.5rem; color: #2F4F4F; font-weight: 700; margin-bottom: 15px; }
+        .pd-desc { font-size: 1rem; color: #666; line-height: 1.8; margin-bottom: 25px; }
+        .pd-price { font-size: 2.2rem; font-weight: 700; color: #1a73e8; margin-bottom: 25px; }
+        
+        .option-group { margin-bottom: 20px; }
+        .option-title { font-weight: 600; color: #4682B4; margin-bottom: 10px; font-size: 1.1rem; }
+        .pill-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .pill { padding: 8px 18px; border: 2px solid #B0E0E6; border-radius: 30px; color: #4682B4; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+        .pill:hover { border-color: #48C9B0; color: #48C9B0; }
+        .pill.active { background: linear-gradient(135deg, #48C9B0 0%, #1ABC9C 100%); color: white; border-color: transparent; box-shadow: 0 4px 10px rgba(72, 201, 176, 0.3); }
 
-        .navbar-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
+        .qty-container { display: flex; align-items: center; gap: 15px; }
+        .qty-btn { background: #B0E0E6; color: #2F4F4F; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+        .qty-btn:hover { background: #48C9B0; color: white; transform: scale(1.1); }
+        .qty-input { width: 60px; height: 40px; text-align: center; border: 2px solid #B0E0E6; border-radius: 10px; font-size: 1.2rem; font-weight: bold; color: #2F4F4F; outline: none; }
 
-        .navbar-logo {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #2F4F4F;
-            text-decoration: none;
-        }
-
-        .navbar-logo .logo {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .navbar-menu {
-            display: flex;
-            list-style: none;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .navbar-menu a {
-            text-decoration: none;
-            color: #2F4F4F;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .navbar-menu a:hover {
-            color: #4682B4;
-        }
-
-        .product-page-wrapper {
-            flex: 1;
-            padding: 4rem 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .product-detail-container {
-            background: white;
-            max-width: 1000px;
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            display: flex;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .breadcrumb {
-            position: absolute;
-            top: 20px;
-            left: 30px;
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        .breadcrumb a {
-            color: #48C9B0;
-            text-decoration: none;
-        }
-
-        .image-section {
-            flex: 1;
-            background: linear-gradient(135deg, #E0F6FF 0%, #B0E0E6 100%);
-            padding: 4rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .image-section img {
-            width: 100%;
-            max-width: 350px;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease;
-        }
-
-        .image-section img:hover {
-            transform: scale(1.03);
-        }
-
-        .info-section {
-            flex: 1;
-            padding: 4rem 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .badge {
-            display: inline-block;
-            background: #FF6B6B;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-
-        .pd-title {
-            font-size: 2.5rem;
-            color: #2F4F4F;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .pd-desc {
-            font-size: 1rem;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 25px;
-        }
-
-        .pd-price {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #1a73e8;
-            margin-bottom: 25px;
-        }
-
-        .option-group {
-            margin-bottom: 20px;
-        }
-
-        .option-title {
-            font-weight: 600;
-            color: #4682B4;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .pill-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .pill {
-            padding: 8px 18px;
-            border: 2px solid #B0E0E6;
-            border-radius: 30px;
-            color: #4682B4;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .pill:hover {
-            border-color: #48C9B0;
-            color: #48C9B0;
-        }
-
-        .pill.active {
-            background: linear-gradient(135deg, #48C9B0 0%, #1ABC9C 100%);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 10px rgba(72, 201, 176, 0.3);
-        }
-
-        /* 數量選擇器樣式 */
-        .qty-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .qty-btn {
-            background: #B0E0E6;
-            color: #2F4F4F;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .qty-btn:hover {
-            background: #48C9B0;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .qty-input {
-            width: 60px;
-            height: 40px;
-            text-align: center;
-            border: 2px solid #B0E0E6;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #2F4F4F;
-            outline: none;
-        }
-
-        .btn-add-cart {
-            background: linear-gradient(135deg, #5DADE2 0%, #4682B4 100%);
-            color: white;
-            border: none;
-            padding: 18px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-            box-shadow: 0 10px 20px rgba(93, 173, 226, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-add-cart:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 25px rgba(93, 173, 226, 0.4);
-        }
+        .btn-add-cart { background: linear-gradient(135deg, #5DADE2 0%, #4682B4 100%); color: white; border: none; padding: 18px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; box-shadow: 0 10px 20px rgba(93, 173, 226, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-add-cart:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(93, 173, 226, 0.4); }
 
         @media (max-width: 900px) {
-            .product-detail-container {
-                flex-direction: column;
-            }
-
-            .image-section {
-                padding: 3rem 2rem;
-            }
-
-            .image-section img {
-                max-width: 250px;
-            }
-
-            .info-section {
-                padding: 3rem 2rem;
-            }
-
-            .pd-title {
-                font-size: 2rem;
-            }
+            .product-detail-container { flex-direction: column; }
+            .image-section { padding: 3rem 2rem; } .image-section img { max-width: 250px; }
+            .info-section { padding: 3rem 2rem; } .pd-title { font-size: 2rem; }
         }
     </style>
 </head>
-
 <body>
 
     <nav class="navbar">
@@ -306,8 +71,7 @@
                 <li><a href="index.html">回首頁</a></li>
                 <li><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> 購物車</a></li>
                 <li id="nav-login"><a href="login.html"><i class="fa-solid fa-user"></i> 登入/註冊</a></li>
-                <li id="nav-user" style="display:none;"><a href="#" id="user-display"
-                        style="color:#1a73e8; font-weight:bold;"></a></li>
+                <li id="nav-user" style="display:none;"><a href="#" id="user-display" style="color:#1a73e8; font-weight:bold;"></a></li>
                 <li id="nav-logout" style="display:none;"><a href="#" id="btn-logout" style="color:#e74c3c;">登出</a></li>
             </ul>
         </div>
@@ -316,11 +80,11 @@
     <div class="product-page-wrapper">
         <div class="product-detail-container">
             <div class="breadcrumb"><a href="index.html">首頁</a> > <span style="color:#4682B4;">商品詳細</span></div>
-
+            
             <div class="image-section">
                 <img id="pd-image" src="" alt="商品圖片">
             </div>
-
+            
             <div class="info-section">
                 <div class="badge">推薦飲品</div>
                 <h1 class="pd-title" id="pd-name">載入中...</h1>
@@ -388,32 +152,27 @@
 
         document.getElementById('btn-logout').addEventListener('click', (e) => {
             e.preventDefault();
-            if (confirm("確定要登出嗎？")) {
-                localStorage.removeItem('dejeng_cart');
-                signOut(auth).then(() => { window.location.href = "index.html"; });
-            }
+            if(confirm("確定要登出嗎？")) { localStorage.removeItem('dejeng_cart'); signOut(auth).then(() => { window.location.href = "index.html"; }); }
         });
     </script>
 
     <script>
-        // 切換按鈕樣式
         function selectPill(element, containerId) {
             const container = document.getElementById(containerId);
             const pills = container.getElementsByClassName('pill');
-            for (let i = 0; i < pills.length; i++) { pills[i].classList.remove('active'); }
+            for(let i = 0; i < pills.length; i++) { pills[i].classList.remove('active'); }
             element.classList.add('active');
         }
 
-        // 改變數量
         function changeQty(amount) {
             const qtyInput = document.getElementById('pd-qty');
             let currentQty = parseInt(qtyInput.value);
             currentQty += amount;
-            if (currentQty < 1) currentQty = 1;
+            if(currentQty < 1) currentQty = 1;
             qtyInput.value = currentQty;
         }
 
-        // 商品資料庫
+        // 包含新增 5 款商品的完整資料庫
         const productsDB = {
             "tea01": { name: "水之森玄米抹茶", price: 65, img: "image/01.jpg", desc: "嚴選靜岡抹茶搭配焙煎玄米，茶湯翠綠，帶有濃郁的米香與抹茶回甘，層次豐富的經典風味。" },
             "tea02": { name: "英倫伯爵紅茶", price: 55, img: "image/02.jpg", desc: "特選錫蘭紅茶為基底，佐以佛手柑香氣，茶感醇厚，散發迷人優雅的英倫風情。" },
@@ -422,39 +181,36 @@
             "tea05": { name: "嫩仙草凍奶", price: 70, img: "image/05.jpg", desc: "古法熬煮的滑順嫩仙草，加入濃郁奶香，口感清爽滑順，夏日消暑首選。" },
             "tea06": { name: "海鹽芒果綠", price: 65, img: "image/06.jpg", desc: "新鮮芒果果露搭配清香綠茶，上層鋪滿微鹹海鹽奶蓋，鹹甜交織的熱帶風味。" },
             "tea12": { name: "季節限定特調", price: 85, img: "image/12.jpg", desc: "嚴選當季新鮮水果，搭配茶師特調茶底，每一口都能喝到時令的鮮甜與驚喜。" },
-            "tea13": { name: "招牌綜合果茶", price: 90, img: "image/13.jpg", desc: "滿滿的新鮮水果切片，融入清香回甘的茶湯中，果香與茶香的完美交響曲。" }
+            "tea13": { name: "招牌綜合果茶", price: 90, img: "image/13.jpg", desc: "滿滿的新鮮水果切片，融入清香回甘的茶湯中，果香與茶香的完美交響曲。" },
+            "tea27": { name: "焙烏龍鮮奶", price: 70, img: "image/27.jpg", desc: "精選深焙烏龍茶，搭配醇厚鮮奶，火侯拿捏恰到好處，帶有迷人的碳焙香氣。" },
+            "tea28": { name: "柚見冰茶", price: 65, img: "image/28.jpg", desc: "新鮮葡萄柚果肉搭配清香綠茶，酸甜清爽，每一口都充滿陽光的滋味。" },
+            "tea31": { name: "蜜桃春烏龍", price: 75, img: "image/31.jpg", desc: "特選蜜桃果泥與春季採收的烏龍茶完美結合，茶香與果香交織，清甜迷人。" },
+            "tea32": { name: "芝士奶蓋紅茶", price: 70, img: "image/32.jpg", desc: "特製微鹹濃郁芝士奶蓋，覆蓋在經典伯爵紅茶之上，口感綿密層次豐富。" },
+            "tea33": { name: "桂花烏龍凍飲", price: 65, img: "image/33.jpg", desc: "淡雅桂花香氣撲鼻，搭配滑順手作桂花凍，清涼解渴的優雅之選。" }
         };
 
-        // 讀取網址並渲染
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
 
-            if (productId && productsDB[productId]) {
+            if(productId && productsDB[productId]) {
                 const pd = productsDB[productId];
                 document.title = `${pd.name} - 得正 dejeng`;
                 document.getElementById('pd-image').src = pd.img;
                 document.getElementById('pd-name').innerText = pd.name;
                 document.getElementById('pd-desc').innerText = pd.desc;
                 document.getElementById('pd-price').innerText = `NT$ ${pd.price}`;
-
-                // 加入陣列購物車邏輯
+                
                 document.getElementById('add-to-cart-btn').addEventListener('click', () => {
                     const qty = parseInt(document.getElementById('pd-qty').value);
                     const sugar = document.querySelector('#sugar-options .active').innerText;
                     const ice = document.querySelector('#ice-options .active').innerText;
-
-                    // 讀取購物車 (若沒有則為空陣列)
+                    
                     let cart = JSON.parse(localStorage.getItem('dejeng_cart')) || [];
-
-                    // 檢查是否有一模一樣的飲料（同ID、同甜度、同冰塊）
                     const existingIndex = cart.findIndex(item => item.id === productId && item.sugar === sugar && item.ice === ice);
-
-                    if (existingIndex > -1) {
-                        cart[existingIndex].qty += qty; // 相同則數量相加
-                    } else {
-                        cart.push({ id: productId, qty: qty, sugar: sugar, ice: ice }); // 否則新增一筆
-                    }
+                    
+                    if (existingIndex > -1) { cart[existingIndex].qty += qty; } 
+                    else { cart.push({ id: productId, qty: qty, sugar: sugar, ice: ice }); }
 
                     localStorage.setItem('dejeng_cart', JSON.stringify(cart));
                     alert(`【${pd.name}】(${sugar}/${ice}) x ${qty} 已加入購物車！`);
@@ -467,5 +223,4 @@
         });
     </script>
 </body>
-
 </html>
