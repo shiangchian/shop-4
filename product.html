@@ -2,31 +2,61 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的購物車 - 得正 dejeng</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <title>商品介紹 - 得正 dejeng</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <style>
-        :root { --primary-gradient: linear-gradient(90deg, #48C9B0 0%, #1ABC9C 100%); --glass-bg: rgba(255, 255, 255, 0.9); }
-        body { background: #f4f6f8; color: #333; font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
-        .navbar { background: #B0E0E6 !important; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-        .brand-logo { font-weight: bold; color: #2F4F4F; text-decoration: none; display: flex; align-items: center; }
-        .brand-logo img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
-        .cart-item { background: white; border: 1px solid #ddd; border-radius: 15px; padding: 20px; margin-bottom: 20px; transition: 0.3s; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .cart-img { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-right: 15px; }
-        .qty-input { background: #f8f9fa; border: 1px solid #ccc; width: 60px; text-align: center; border-radius: 5px; padding: 5px; }
-        .summary-card { background: white; border: 1px solid #ddd; border-radius: 15px; padding: 30px; position: sticky; top: 100px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: #555; }
-        .total-row { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 1.5rem; font-weight: bold; color: #1a73e8; }
-        .btn-checkout { background: var(--primary-gradient); border: none; color: white; font-weight: bold; padding: 15px; border-radius: 50px; width: 100%; margin-top: 20px; transition: 0.3s; box-shadow: 0 4px 15px rgba(26, 188, 156, 0.4); }
-        .btn-checkout:hover { transform: scale(1.02); color: white; background: linear-gradient(90deg, #1ABC9C 0%, #16A085 100%); }
-        .trash-btn { color: #ff4d4d; background: transparent; border: none; font-size: 1.2rem; margin-left: 15px; transition: 0.3s; }
-        .trash-btn:hover { color: #ff0000; transform: scale(1.2); }
-        .empty-cart { display: none; text-align: center; padding: 80px 20px; }
-        .toast-custom { background: white; color: #333; border-left: 4px solid #1ABC9C; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f8; min-height: 100vh; display: flex; flex-direction: column; }
         
-        .main-content { flex: 1; }
+        .navbar { background: #B0E0E6; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .navbar-container { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .navbar-logo { display: flex; align-items: center; font-size: 1.5rem; font-weight: bold; color: #2F4F4F; text-decoration: none; }
+        .navbar-logo .logo { width: 40px; height: 40px; margin-right: 10px; }
+        .navbar-menu { display: flex; list-style: none; gap: 20px; align-items: center; }
+        .navbar-menu a { text-decoration: none; color: #2F4F4F; font-weight: 500; transition: color 0.3s ease; font-size: 0.95rem; }
+        .navbar-menu a:hover { color: #4682B4; }
+
+        .product-page-wrapper { flex: 1; padding: 4rem 2rem; display: flex; justify-content: center; align-items: center; }
+        .product-detail-container { 
+            background: white; max-width: 1000px; width: 100%; border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08); display: flex; overflow: hidden; position: relative;
+        }
+        .breadcrumb { position: absolute; top: 20px; left: 30px; font-size: 0.9rem; color: #888; }
+        .breadcrumb a { color: #48C9B0; text-decoration: none; }
+        
+        .image-section { flex: 1; background: linear-gradient(135deg, #E0F6FF 0%, #B0E0E6 100%); padding: 4rem; display: flex; justify-content: center; align-items: center; }
+        .image-section img { width: 100%; max-width: 350px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); transition: transform 0.3s ease; }
+        .image-section img:hover { transform: scale(1.03); }
+
+        .info-section { flex: 1; padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; }
+        .badge { display: inline-block; background: #FF6B6B; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }
+        .pd-title { font-size: 2.5rem; color: #2F4F4F; font-weight: 700; margin-bottom: 15px; }
+        .pd-desc { font-size: 1rem; color: #666; line-height: 1.8; margin-bottom: 25px; }
+        .pd-price { font-size: 2.2rem; font-weight: 700; color: #1a73e8; margin-bottom: 25px; }
+        
+        .option-group { margin-bottom: 20px; }
+        .option-title { font-weight: 600; color: #4682B4; margin-bottom: 10px; font-size: 1.1rem; }
+        .pill-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .pill { padding: 8px 18px; border: 2px solid #B0E0E6; border-radius: 30px; color: #4682B4; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+        .pill:hover { border-color: #48C9B0; color: #48C9B0; }
+        .pill.active { background: linear-gradient(135deg, #48C9B0 0%, #1ABC9C 100%); color: white; border-color: transparent; box-shadow: 0 4px 10px rgba(72, 201, 176, 0.3); }
+
+        .qty-container { display: flex; align-items: center; gap: 15px; }
+        .qty-btn { background: #B0E0E6; color: #2F4F4F; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+        .qty-btn:hover { background: #48C9B0; color: white; transform: scale(1.1); }
+        .qty-input { width: 60px; height: 40px; text-align: center; border: 2px solid #B0E0E6; border-radius: 10px; font-size: 1.2rem; font-weight: bold; color: #2F4F4F; outline: none; }
+
+        .btn-add-cart { background: linear-gradient(135deg, #5DADE2 0%, #4682B4 100%); color: white; border: none; padding: 18px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; box-shadow: 0 10px 20px rgba(93, 173, 226, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-add-cart:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(93, 173, 226, 0.4); }
+
+        @media (max-width: 900px) {
+            .product-detail-container { flex-direction: column; }
+            .image-section { padding: 3rem 2rem; } .image-section img { max-width: 250px; }
+            .info-section { padding: 3rem 2rem; } .pd-title { font-size: 2rem; }
+        }
 
         /* Footer Styles */
         .footer { background: linear-gradient(135deg, #E8F8F5 0%, #D1F2EB 100%); padding: 4rem 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; position: relative; overflow: hidden; border-top: none; }
@@ -46,71 +76,94 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
-        <div class="container">
-            <a class="navbar-brand brand-logo fs-4" href="index.html">
-                <img src="image/logo.jpeg" alt="Logo"> 得正 dejeng
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">
+                <img src="image/logo.jpeg" alt="得正 dejeng" class="logo">
+                <span>得正 dejeng</span>
             </a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto ms-4">
-                    <li class="nav-item"><a class="nav-link text-dark fw-bold" href="index.html"><i class="fa-solid fa-arrow-left"></i> 繼續點餐</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <span id="user-display" class="badge bg-info text-dark px-3 py-2" style="display:none;"></span>
-                    <a id="btn-login" class="btn btn-outline-dark rounded-pill px-4" href="login.html">登入</a>
-                    <button id="btn-logout" class="btn btn-outline-danger rounded-pill px-4" style="display:none;">登出</button>
-                </div>
-            </div>
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html#drinks"><i class="fa-solid fa-mug-hot"></i> 飲品區</a></li>
+                <li><a href="index.html#donuts"><i class="fa-solid fa-cookie"></i> 甜甜圈</a></li>
+                <li><a href="index.html#fruits"><i class="fa-solid fa-apple-whole"></i> 鮮果區</a></li>
+                <li><a href="leaderboard.html"><i class="fa-solid fa-crown"></i> 排行榜</a></li>
+                <li><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> 購物車</a></li>
+                <li id="nav-login"><a href="login.html"><i class="fa-solid fa-user"></i> 登入/註冊</a></li>
+                <li id="nav-user" style="display:none;"><a href="#" id="user-display" style="color:#1a73e8; font-weight:bold;"></a></li>
+                <li id="nav-logout" style="display:none;"><a href="#" id="btn-logout" style="color:#e74c3c;">登出</a></li>
+            </ul>
         </div>
     </nav>
 
-    <div class="main-content container py-5">
-        <h2 class="mb-4 fw-bold text-dark"><i class="fa-solid fa-cart-shopping text-info me-2"></i>我的購物車</h2>
-        
-        <div class="row" id="cart-content">
-            <div class="col-lg-8" id="cart-items-container"></div>
-            <div class="col-lg-4">
-                <div class="summary-card">
-                    <h4 class="mb-4 fw-bold border-bottom pb-3 text-dark">訂單摘要</h4>
-                    <div class="summary-row"><span>總杯數</span><span id="total-cups">0 杯</span></div>
-                    <div class="summary-row"><span>小計</span><span>$<span id="subtotal">0</span></span></div>
-                    <div class="summary-row"><span>外送費</span><span class="text-success fw-bold">免運費</span></div>
-                    <div class="total-row"><span>總金額</span><span>$<span id="final-total">0</span></span></div>
-                    <button class="btn-checkout" onclick="checkout()">前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i></button>
-                </div>
+    <div class="product-page-wrapper">
+        <div class="product-detail-container">
+            <div class="breadcrumb"><a href="index.html">首頁</a> > <span style="color:#4682B4;">商品詳細</span></div>
+            
+            <div class="image-section">
+                <img id="pd-image" src="" alt="商品圖片">
             </div>
-        </div>
+            
+            <div class="info-section">
+                <div id="pd-badge" class="badge">推薦商品</div>
+                <h1 class="pd-title" id="pd-name">載入中...</h1>
+                <p class="pd-desc" id="pd-desc">商品描述載入中，請稍候...</p>
+                <div class="pd-price" id="pd-price">NT$ 0</div>
 
-        <div class="empty-cart" id="empty-state">
-            <i class="fa-solid fa-mug-hot fa-5x text-secondary mb-4 opacity-50"></i>
-            <h3 class="text-dark fw-bold">您的購物車是空的</h3>
-            <p class="text-muted mb-4">看起來您還沒有加入任何茶飲。</p>
-            <a href="index.html" class="btn btn-outline-info rounded-pill px-5">去選購茶飲</a>
+                <div class="option-group" id="sugar-group">
+                    <div class="option-title"><i class="fa-solid fa-spoon"></i> 甜度選擇</div>
+                    <div class="pill-container" id="sugar-options">
+                        <div class="pill active" onclick="selectPill(this, 'sugar-options')">正常糖</div>
+                        <div class="pill" onclick="selectPill(this, 'sugar-options')">少糖</div>
+                        <div class="pill" onclick="selectPill(this, 'sugar-options')">半糖</div>
+                        <div class="pill" onclick="selectPill(this, 'sugar-options')">微糖</div>
+                        <div class="pill" onclick="selectPill(this, 'sugar-options')">無糖</div>
+                    </div>
+                </div>
+
+                <div class="option-group" id="ice-group">
+                    <div class="option-title"><i class="fa-solid fa-snowflake"></i> 冰塊選擇</div>
+                    <div class="pill-container" id="ice-options">
+                        <div class="pill active" onclick="selectPill(this, 'ice-options')">正常冰</div>
+                        <div class="pill" onclick="selectPill(this, 'ice-options')">少冰</div>
+                        <div class="pill" onclick="selectPill(this, 'ice-options')">微冰</div>
+                        <div class="pill" onclick="selectPill(this, 'ice-options')">去冰</div>
+                        <div class="pill" onclick="selectPill(this, 'ice-options')">完全去冰</div>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <div class="option-title"><i class="fa-solid fa-plus-minus"></i> 購買數量</div>
+                    <div class="qty-container">
+                        <button class="qty-btn" onclick="changeQty(-1)"><i class="fa-solid fa-minus"></i></button>
+                        <input type="number" id="pd-qty" class="qty-input" value="1" min="1" readonly>
+                        <button class="qty-btn" onclick="changeQty(1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <button class="btn-add-cart" id="add-to-cart-btn">
+                    <i class="fa-solid fa-cart-plus"></i> 加入購物車
+                </button>
+            </div>
         </div>
     </div>
 
     <footer class="footer">
         <div class="footer-section">
             <h3>品牌區塊</h3>
-            <p>得正 dejeng - Premium Tea Experience</p>
+            <p>得正 dejeng - 飲品 x 甜點 x 鮮果</p>
             <div class="social-links">
-                <a href="https://facebook.com" target="_blank"><img src="image/facebook-logo.png" alt="Facebook Logo" class="social-logo"> Facebook</a>
                 <a href="https://instagram.com" target="_blank"><img src="image/Instagram-logo.png" alt="Instagram Logo" class="social-logo"> Instagram</a>
                 <a href="https://line.me" target="_blank"><img src="image/line-logo.png" alt="LINE Logo" class="social-logo"> LINE</a>
-                <a href="https://youtube.com" target="_blank"><img src="image/youtube-logo.png" alt="YouTube Logo" class="social-logo"> YouTube</a>
             </div>
         </div>
         <div class="footer-section">
             <h3>BUSINESS 商業區塊</h3>
             <ul>
-                <li><a href="index.html">🍵 完整菜單</a></li>
+                <li><a href="index.html#drinks">🥤 經典飲品</a></li>
+                <li><a href="index.html#donuts">🍩 手作甜甜圈</a></li>
+                <li><a href="index.html#fruits">🍎 鮮切水果</a></li>
                 <li><a href="leaderboard.html">⭐ 熱銷排行</a></li>
-                <li><a href="index.html">🖼️ 店面環境</a></li>
-                <li><a href="index.html">📄 最新DM</a></li>
-                <li><a href="index.html">📁 品牌作品</a></li>
-                <li><a href="index.html">🎁 會員優惠</a></li>
-                <li><a href="index.html">🚚 外送服務</a></li>
-                <li><a href="index.html">📍 門市據點</a></li>
             </ul>
         </div>
         <div class="footer-section">
@@ -118,8 +171,6 @@
             <p>📧 電子郵件：a113280055@gm.usc.edu.tw</p>
             <p>📞 電話：0952702813</p>
             <p>🏪 地址：台北市大安區忠孝東路四段123號</p>
-            <p>🚇 交通：捷運忠孝敦化站 2號出口步行3分鐘</p>
-            <p>⏰ 營業時間：週一至週日 10:00-22:00 (全年無休)</p>
         </div>
         <div class="footer-section">
             <h3>版權資訊</h3>
@@ -128,140 +179,142 @@
         </div>
     </footer>
 
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="liveToast" class="toast toast-custom align-items-center"><div class="d-flex"><div class="toast-body fs-6"></div><button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button></div></div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        
+
         const firebaseConfig = { apiKey: "AIzaSyC-LcCfcPYCYAQZ7n45YCe6tCY_jb-ygvI", authDomain: "sonicboom-shop.firebaseapp.com", projectId: "sonicboom-shop", storageBucket: "sonicboom-shop.firebasestorage.app", messagingSenderId: "976804831944", appId: "1:976804831944:web:6ede6a95196478bd49bbfd", measurementId: "G-3FEKWL0QXZ" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
+
         onAuthStateChanged(auth, (user) => {
+            const navLogin = document.getElementById('nav-login');
+            const navUser = document.getElementById('nav-user');
+            const navLogout = document.getElementById('nav-logout');
             const userDisplay = document.getElementById('user-display');
-            const btnLogin = document.getElementById('btn-login');
-            const btnLogout = document.getElementById('btn-logout');
+
             if (user) {
-                userDisplay.style.display = 'inline-block';
-                // 加上「會員」兩字
-                userDisplay.innerHTML = `<i class="fa-solid fa-user me-2"></i> 會員 ${user.displayName || user.email.split('@')[0]}`;
-                btnLogin.style.display = 'none';
-                btnLogout.style.display = 'inline-block';
+                navLogin.style.display = 'none';
+                navUser.style.display = 'block';
+                navLogout.style.display = 'block';
+                userDisplay.innerHTML = `<i class="fa-solid fa-user-check me-1"></i> 會員 ${user.displayName || user.email.split('@')[0]}`;
             } else {
-                userDisplay.style.display = 'none';
-                btnLogin.style.display = 'inline-block';
-                btnLogout.style.display = 'none';
+                navLogin.style.display = 'block';
+                navUser.style.display = 'none';
+                navLogout.style.display = 'none';
             }
         });
 
-        document.getElementById('btn-logout').addEventListener('click', () => { 
-            if(confirm("確定要登出嗎？")) { localStorage.removeItem('dejeng_cart'); signOut(auth).then(() => { window.location.href = "index.html"; }); } 
+        document.getElementById('btn-logout').addEventListener('click', (e) => {
+            e.preventDefault();
+            if(confirm("確定要登出嗎？")) { localStorage.removeItem('dejeng_cart'); signOut(auth).then(() => { window.location.href = "index.html"; }); }
         });
     </script>
 
     <script>
-        const products = {
-            "tea01": { name: "水之森玄米抹茶", price: 65, img: "image/01.jpg" },
-            "tea02": { name: "英倫伯爵紅茶", price: 55, img: "image/02.jpg" },
-            "tea03": { name: "珍珠鮮奶", price: 75, img: "image/03.jpg" },
-            "tea04": { name: "手炒黑糖鮮奶", price: 80, img: "image/04.jpg" },
-            "tea05": { name: "嫩仙草凍奶", price: 70, img: "image/05.jpg" },
-            "tea06": { name: "海鹽芒果綠", price: 65, img: "image/06.jpg" },
-            "tea12": { name: "季節限定特調", price: 85, img: "image/12.jpg" },
-            "tea13": { name: "招牌綜合果茶", price: 90, img: "image/13.jpg" },
-            "tea27": { name: "焙烏龍鮮奶", price: 70, img: "image/27.jpg" },
-            "tea28": { name: "柚見冰茶", price: 65, img: "image/28.jpg" },
-            "tea31": { name: "蜜桃春烏龍", price: 75, img: "image/31.jpg" },
-            "tea32": { name: "芝士奶蓋紅茶", price: 70, img: "image/32.jpg" },
-            "tea33": { name: "桂花烏龍凍飲", price: 65, img: "image/33.jpg" }
+        function selectPill(element, containerId) {
+            const container = document.getElementById(containerId);
+            const pills = container.getElementsByClassName('pill');
+            for(let i = 0; i < pills.length; i++) { pills[i].classList.remove('active'); }
+            element.classList.add('active');
+        }
+
+        function changeQty(amount) {
+            const qtyInput = document.getElementById('pd-qty');
+            let currentQty = parseInt(qtyInput.value);
+            currentQty += amount;
+            if(currentQty < 1) currentQty = 1;
+            qtyInput.value = currentQty;
+        }
+
+        const productsDB = {
+            "tea01": { name: "水之森玄米抹茶", price: 65, img: "image/01.jpg", desc: "嚴選靜岡抹茶搭配焙煎玄米，茶湯翠綠，帶有濃郁的米香與抹茶回甘。" },
+            "tea02": { name: "英倫伯爵紅茶", price: 55, img: "image/02.jpg", desc: "特選錫蘭紅茶為基底，佐以佛手柑香氣，茶感醇厚，散發迷人優雅的英倫風情。" },
+            "tea03": { name: "珍珠鮮奶", price: 75, img: "image/03.jpg", desc: "Q彈手作珍珠搭配綠光牧場直送鮮乳，濃郁奶香與黑糖香氣完美融合。" },
+            "tea04": { name: "手炒黑糖鮮奶", price: 80, img: "image/04.jpg", desc: "職人每日手工慢炒黑糖，淋上醇厚鮮奶，甜而不膩，帶有獨特焦糖香。" },
+            "tea05": { name: "嫩仙草凍奶", price: 70, img: "image/05.jpg", desc: "古法熬煮的滑順嫩仙草，加入濃郁奶香，口感清爽滑順，夏日消暑首選。" },
+            "tea06": { name: "海鹽芒果綠", price: 65, img: "image/06.jpg", desc: "新鮮芒果果露搭配清香綠茶，上層鋪滿微鹹海鹽奶蓋，鹹甜交織。" },
+            "tea07": { name: "琥珀高峰烏龍", price: 55, img: "image/07.jpg", desc: "特選台灣高山烏龍，茶湯呈現清透琥珀色，入喉回甘悠長。" },
+            "tea08": { name: "茉香綠茶拿鐵", price: 65, img: "image/08.jpg", desc: "清雅的茉莉綠茶搭配滑順拿鐵，奶香與茶香交織出細膩層次。" },
+            "tea09": { name: "芋頭鮮奶", price: 85, img: "image/09.jpg", desc: "嚴選大甲芋頭熬煮成綿密芋泥，融入香醇鮮奶，每一口都是真材實料。" },
+            "tea10": { name: "果漾微甜氣泡飲", price: 75, img: "image/10.jpg", desc: "繽紛鮮果搭配爽口氣泡水，微甜滋味在舌尖跳躍，清涼消暑。" },
+            "tea11": { name: "經典冰水果茶", price: 80, img: "image/11.jpg", desc: "滿滿新鮮水果與紅茶完美調和，豐富的果香層次令人回味無窮。" },
+            "tea12": { name: "季節限定特調", price: 85, img: "image/12.jpg", desc: "嚴選當季新鮮水果，搭配茶師特調茶底，喝到時令的鮮甜與驚喜。" },
+            "tea13": { name: "招牌綜合果茶", price: 90, img: "image/13.jpg", desc: "滿滿的新鮮水果切片，融入清香回甘的茶湯中，果香與茶香的完美交響曲。" },
+            "tea27": { name: "焙烏龍鮮奶", price: 70, img: "image/27.jpg", desc: "精選深焙烏龍茶，搭配醇厚鮮奶，火侯拿捏恰到好處，帶有迷人的碳焙香氣。" },
+            "tea28": { name: "柚見冰茶", price: 65, img: "image/28.jpg", desc: "新鮮葡萄柚果肉搭配清香綠茶，酸甜清爽，每一口都充滿陽光的滋味。" },
+            "tea31": { name: "蜜桃春烏龍", price: 75, img: "image/31.jpg", desc: "特選蜜桃果泥與春季採收的烏龍茶完美結合，茶香與果香交織，清甜迷人。" },
+            "tea32": { name: "芝士奶蓋紅茶", price: 70, img: "image/32.jpg", desc: "特製微鹹濃郁芝士奶蓋，覆蓋在經典伯爵紅茶之上，口感綿密層次豐富。" },
+            "tea33": { name: "桂花烏龍凍飲", price: 65, img: "image/33.jpg", desc: "淡雅桂花香氣撲鼻，搭配滑順手作桂花凍，清涼解渴的優雅之選。" },
+            
+            "donut01": { name: "蜜糖波堤", price: 45, img: "image/0001.jpg", desc: "人氣招牌！口感Q彈的波堤，裹上薄薄一層甜蜜糖衣，經典不敗的美味。" },
+            "donut02": { name: "雙層巧克力波堤", price: 50, img: "image/0002.jpg", desc: "巧克力控必吃！Ｑ彈巧克力波堤再裹上濃郁黑巧克力，雙重享受。" },
+            "donut03": { name: "草莓波堤", price: 50, img: "image/0003.jpg", desc: "酸甜滋味！草莓巧克力沾醬搭配Q彈波堤，散發淡淡果香，少女心爆發。" },
+            "donut04": { name: "經典糖霜甜甜圈", price: 45, img: "image/0004.jpg", desc: "每日手工發酵揉製，外層裹上經典輕薄糖霜，口感鬆軟綿密。" },
+            "donut05": { name: "巧克力脆片波堤", price: 55, img: "image/0005.jpg", desc: "濃郁巧克力搭配酥脆脆片，咬下去卡滋卡滋，口感豐富多層次。" },
+            "donut06": { name: "草莓夾心甜甜圈", price: 55, img: "image/0006.jpg", desc: "夢幻粉色草莓巧克力外皮，內餡擠滿濃郁草莓卡士達，初戀滋味。" },
+            "donut07": { name: "抹茶巧貝", price: 55, img: "image/0007.jpg", desc: "圓潤可愛的巧貝造型，包裹著靜岡抹茶特調內餡，茶香濃厚而不苦澀。" },
+
+            "fruit01": { name: "鮮甜愛文芒果", price: 100, img: "image/S1.jpg", desc: "台灣特選愛文芒果，金黃果肉飽滿多汁，濃郁香氣讓您一口接一口。" },
+            "fruit02": { name: "清香麻豆文旦", price: 80, img: "image/S2.jpg", desc: "嚴選麻豆老欉文旦，果肉細緻甘甜，散發淡淡柚香，清爽解膩。" },
+            "fruit03": { name: "活力陽光香蕉", price: 50, img: "image/S3.jpg", desc: "產地直送優質香蕉，口感Ｑ彈綿密，快速補充能量的健康首選。" },
+            "fruit04": { name: "嚴選進口紅櫻桃", price: 150, img: "image/S4.jpg", desc: "空運直送頂級紅櫻桃，果實碩大飽滿，酸甜多汁，富含維他命C。" },
+            "fruit05": { name: "清脆鮮切小黃瓜", price: 40, img: "image/S5.jpg", desc: "產銷履歷小黃瓜，每日新鮮切片，口感清脆爽口，低卡無負擔。" },
+            "fruit06": { name: "紐西蘭奇異果", price: 85, img: "image/S6.jpg", desc: "富含膳食纖維與酵素的紐西蘭奇異果，微酸帶甜，餐後解膩最佳選擇。" },
+            "fruit07": { name: "鮮甜多汁水蜜桃", price: 120, img: "image/unnamed.jpg", desc: "嚴選水蜜桃，果皮粉嫩、果肉細白多汁，入口即化的甜蜜滋味。" },
+            "fruit08": { name: "屏東金鑽鳳梨", price: 70, img: "image/unnamed (1).jpg", desc: "台灣驕傲金鑽鳳梨，果肉細緻不咬舌，酸甜比例完美，香氣四溢。" },
+            "fruit09": { name: "屏東黑珍珠蓮霧", price: 90, img: "image/unnamed (2).jpg", desc: "頂級黑珍珠蓮霧，色澤暗紅發亮，果肉清脆多汁，甜度極高。" },
+            "fruit10": { name: "沁涼紅肉西瓜盤", price: 65, img: "image/unnamed (3).jpg", desc: "嚴選特級大西瓜，果肉沙脆、甜度極高，消暑解渴的夏日必備單品。" },
+            "fruit11": { name: "屏東無籽綠檸檬", price: 55, img: "image/unnamed (4).jpg", desc: "產地嚴選綠檸檬，香氣濃郁果汁豐富，適合泡茶或直接鮮榨飲用。" },
+            "fruit12": { name: "清脆甜水梨", price: 85, img: "image/unnamed (5).jpg", desc: "精選優質水梨，果肉雪白細緻，清脆多汁，帶來清涼潤喉的享受。" }
         };
 
-        let cart = JSON.parse(localStorage.getItem('dejeng_cart')) || [];
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
 
-        function renderCart() {
-            const container = document.getElementById('cart-items-container');
-            const emptyState = document.getElementById('empty-state');
-            const cartContent = document.getElementById('cart-content');
-
-            if (cart.length > 0) {
-                emptyState.style.display = 'none';
-                cartContent.style.display = 'flex';
-                let html = '';
-                let total = 0;
-                let totalCups = 0;
-
-                cart.forEach((item, index) => {
-                    const p = products[item.id];
-                    if(!p) return;
-                    const itemTotal = p.price * item.qty;
-                    total += itemTotal;
-                    totalCups += parseInt(item.qty);
-
-                    html += `
-                    <div class="cart-item">
-                        <img src="${p.img}" alt="${p.name}" class="cart-img">
-                        <div class="flex-grow-1">
-                            <h5 class="mb-1 fw-bold">${p.name}</h5>
-                            <p class="text-muted small mb-0"><span class="badge bg-secondary me-1">${item.sugar}</span> <span class="badge bg-secondary">${item.ice}</span></p>
-                        </div>
-                        <div class="text-end me-4">
-                            <div class="mb-2 fw-bold text-primary">$<span class="price">${p.price}</span></div>
-                            <input type="number" class="qty-input" value="${item.qty}" min="1" onchange="updateQty(${index}, this.value)">
-                        </div>
-                        <button class="trash-btn" onclick="removeItem(${index})"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>`;
-                });
+            if(productId && productsDB[productId]) {
+                const pd = productsDB[productId];
+                document.title = `${pd.name} - 得正 dejeng`;
+                document.getElementById('pd-image').src = pd.img;
+                document.getElementById('pd-name').innerText = pd.name;
+                document.getElementById('pd-desc').innerText = pd.desc;
+                document.getElementById('pd-price').innerText = `NT$ ${pd.price}`;
                 
-                container.innerHTML = html;
-                document.getElementById('subtotal').innerText = total.toLocaleString();
-                document.getElementById('final-total').innerText = total.toLocaleString();
-                document.getElementById('total-cups').innerText = `${totalCups} 杯`;
+                // 動態判斷是否顯示冰塊甜度
+                if (!productId.startsWith('tea')) {
+                    document.getElementById('sugar-group').style.display = 'none';
+                    document.getElementById('ice-group').style.display = 'none';
+                    document.getElementById('pd-badge').innerText = '嚴選鮮果 / 手作甜點';
+                    document.getElementById('pd-badge').style.background = '#2ECC71';
+                }
+
+                document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+                    const qty = parseInt(document.getElementById('pd-qty').value);
+                    let sugar = '--';
+                    let ice = '--';
+                    
+                    if (productId.startsWith('tea')) {
+                        sugar = document.querySelector('#sugar-options .active').innerText;
+                        ice = document.querySelector('#ice-options .active').innerText;
+                    }
+                    
+                    let cart = JSON.parse(localStorage.getItem('dejeng_cart')) || [];
+                    const existingIndex = cart.findIndex(item => item.id === productId && item.sugar === sugar && item.ice === ice);
+                    
+                    if (existingIndex > -1) { cart[existingIndex].qty += qty; } 
+                    else { cart.push({ id: productId, qty: qty, sugar: sugar, ice: ice }); }
+
+                    localStorage.setItem('dejeng_cart', JSON.stringify(cart));
+                    let alertText = productId.startsWith('tea') ? `(${sugar}/${ice}) ` : '';
+                    alert(`【${pd.name}】${alertText}x ${qty} 已加入購物車！`);
+                    window.location.href = "cart.html";
+                });
             } else {
-                cartContent.style.display = 'none';
-                emptyState.style.display = 'block';
+                alert('找不到該商品！將返回首頁。');
+                window.location.href = "index.html";
             }
-        }
-
-        window.updateQty = function(index, newQty) {
-            if(newQty < 1) newQty = 1;
-            cart[index].qty = parseInt(newQty);
-            localStorage.setItem('dejeng_cart', JSON.stringify(cart));
-            renderCart();
-        }
-
-        window.removeItem = function(index) {
-            if(confirm('確定要移除此茶飲嗎？')) {
-                cart.splice(index, 1);
-                localStorage.setItem('dejeng_cart', JSON.stringify(cart));
-                renderCart();
-            }
-        }
-
-        window.showToast = function(message) { 
-            const toastEl = document.getElementById('liveToast'); 
-            const toastBody = toastEl.querySelector('.toast-body'); 
-            toastBody.innerHTML = `<i class="fa-solid fa-circle-check text-success me-2"></i> ${message}`; 
-            const toast = new bootstrap.Toast(toastEl); toast.show(); 
-        }
-        
-        window.checkout = function() { 
-            const btn = document.querySelector('.btn-checkout'); 
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> 處理中...'; 
-            btn.disabled = true; 
-            setTimeout(() => { 
-                window.showToast("感謝購買，茶飲製作中！"); 
-                btn.innerHTML = '<i class="fa-solid fa-check me-2"></i> 訂單完成'; 
-                localStorage.removeItem('dejeng_cart'); 
-                cart = [];
-                setTimeout(() => { renderCart(); btn.innerHTML = '前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i>'; btn.disabled = false; }, 2000); 
-            }, 1500); 
-        }
-
-        renderCart();
+        });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
