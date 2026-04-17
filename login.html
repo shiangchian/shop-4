@@ -144,7 +144,12 @@
             btn.disabled = true;
 
             signInWithEmailAndPassword(auth, email, password)
-                .then(() => { window.location.href = "index.html"; })
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const name = user.displayName || user.email.split('@')[0];
+                    // 登入成功後，帶上參數跳轉到 success.html
+                    window.location.href = "success.html?type=login&name=" + encodeURIComponent(name);
+                })
                 .catch((error) => {
                     console.error(error);
                     alert("登入失敗：帳號或密碼錯誤");
