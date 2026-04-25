@@ -28,7 +28,6 @@
         
         .main-content { flex: 1; }
 
-        /* Footer Styles */
         .footer { background: linear-gradient(135deg, #E8F8F5 0%, #D1F2EB 100%); padding: 4rem 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; position: relative; overflow: hidden; border-top: none; margin-top: auto; }
         .footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #48C9B0, #1ABC9C); }
         .footer-section { display: flex; flex-direction: column; gap: 1.2rem; min-width: 0; }
@@ -61,6 +60,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto ms-4">
                     <li class="nav-item"><a class="nav-link text-dark fw-bold" href="index.html"><i class="fa-solid fa-arrow-left"></i> 繼續選購</a></li>
+                    <li class="nav-item ms-3"><a class="nav-link fw-bold" href="database_demo.html" style="color: #e74c3c !important;"><i class="fa-solid fa-database"></i> 後台資料庫</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
                     <span id="user-display" class="badge bg-info text-dark px-3 py-2" style="display:none; font-size: 0.95rem;"></span>
@@ -75,8 +75,7 @@
         <h2 class="mb-4 fw-bold text-dark"><i class="fa-solid fa-cart-shopping text-info me-2"></i>我的購物車</h2>
         
         <div class="row" id="cart-content">
-            <div class="col-lg-8" id="cart-items-container">
-                </div>
+            <div class="col-lg-8" id="cart-items-container"></div>
             <div class="col-lg-4 mt-4 mt-lg-0">
                 <div class="summary-card">
                     <h4 class="mb-4 fw-bold border-bottom pb-3 text-dark">訂單摘要</h4>
@@ -113,6 +112,7 @@
                 <li><a href="index.html#donuts">🍩 手作甜甜圈</a></li>
                 <li><a href="index.html#fruits">🍎 鮮切水果</a></li>
                 <li><a href="leaderboard.html">⭐ 熱銷排行</a></li>
+                <li><a href="database_demo.html" style="color:#1a73e8; font-weight:bold;">📦 後台資料庫</a></li>
             </ul>
         </div>
         <div class="footer-section">
@@ -123,7 +123,7 @@
         </div>
         <div class="footer-section">
             <h3>版權資訊</h3>
-            <p>© 2025 得正 dejeng. All rights reserved.</p>
+            <p>© 2026 得正 dejeng. All rights reserved.</p>
             <p>設計製作者：薛翔謙</p>
         </div>
     </footer>
@@ -146,7 +146,7 @@
             const btnLogout = document.getElementById('btn-logout');
             if (user) {
                 userDisplay.style.display = 'inline-block';
-                userDisplay.innerHTML = `<i class="fa-solid fa-user-check me-1"></i> 會員 ${user.displayName || user.email.split('@')[0]}`;
+                userDisplay.innerHTML = `<i class="fa-solid fa-user-check me-1"></i> 會員 <span id="current-user-name">${user.displayName || user.email.split('@')[0]}</span>`;
                 btnLogin.style.display = 'none';
                 btnLogout.style.display = 'inline-block';
             } else {
@@ -181,7 +181,6 @@
             "tea31": { name: "蜜桃春烏龍", price: 75, img: "image/31.jpg" },
             "tea32": { name: "芝士奶蓋紅茶", price: 70, img: "image/32.jpg" },
             "tea33": { name: "桂花烏龍凍飲", price: 65, img: "image/33.jpg" },
-            
             "donut01": { name: "蜜糖波堤", price: 45, img: "image/0001.jpg" },
             "donut02": { name: "雙層巧克力波堤", price: 50, img: "image/0002.jpg" },
             "donut03": { name: "草莓波堤", price: 50, img: "image/0003.jpg" },
@@ -189,7 +188,6 @@
             "donut05": { name: "巧克力脆片波堤", price: 55, img: "image/0005.jpg" },
             "donut06": { name: "草莓夾心甜甜圈", price: 55, img: "image/0006.jpg" },
             "donut07": { name: "抹茶巧貝", price: 55, img: "image/0007.jpg" },
-
             "fruit01": { name: "鮮甜愛文芒果", price: 100, img: "image/S1.jpg" },
             "fruit02": { name: "清香麻豆文旦", price: 80, img: "image/S2.jpg" },
             "fruit03": { name: "活力陽光香蕉", price: 50, img: "image/S3.jpg" },
@@ -280,16 +278,61 @@
             const toast = new bootstrap.Toast(toastEl); toast.show(); 
         }
         
+        // --- 結帳時，將商品清單存入訂單記錄 ---
         window.checkout = function() { 
+            if(cart.length === 0) {
+                alert("購物車是空的喔！");
+                return;
+            }
+
             const btn = document.querySelector('.btn-checkout'); 
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> 訂單處理中...'; 
             btn.disabled = true; 
+            
             setTimeout(() => { 
+                let total = 0;
+                let purchasedItems = []; // 準備用來裝商品明細
+
+                // 1. 計算金額並打包商品名稱
+                cart.forEach(item => {
+                    const p = productsDB[item.id];
+                    if(p) {
+                        total += (p.price * item.qty);
+                        // 如果有甜度冰塊，把它加在名字後面
+                        let spec = (item.sugar !== '--' && item.ice !== '--') ? ` (${item.sugar}/${item.ice})` : '';
+                        purchasedItems.push(`${p.name}${spec} x${item.qty}`);
+                    }
+                });
+
+                // 2. 取得顧客名稱
+                let customerName = "訪客 (前台購買)";
+                const nameSpan = document.getElementById('current-user-name');
+                if (nameSpan) { customerName = nameSpan.innerText; }
+
+                // 3. 建立訂單，並把 items(明細) 寫進去
+                const newOrder = {
+                    total: total,
+                    items: purchasedItems, // ★ 關鍵：把明細存進去
+                    itemsCount: cart.length,
+                    customer: customerName,
+                    timestamp: new Date().getTime()
+                };
+                
+                let orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+                orders.push(newOrder);
+                localStorage.setItem('dejeng_orders', JSON.stringify(orders));
+
+                // 4. 結帳完成，清空畫面
                 window.showToast("感謝您的購買，訂單已成立！"); 
                 btn.innerHTML = '<i class="fa-solid fa-check me-2"></i> 結帳完成'; 
                 localStorage.removeItem('dejeng_cart'); 
                 cart = [];
-                setTimeout(() => { renderCart(); btn.innerHTML = '前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i>'; btn.disabled = false; }, 2000); 
+                
+                setTimeout(() => { 
+                    renderCart(); 
+                    btn.innerHTML = '前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i>'; 
+                    btn.disabled = false; 
+                }, 2000); 
             }, 1500); 
         }
 
