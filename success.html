@@ -159,13 +159,26 @@
             <h1 class="msg-title" id="display-title">會員註冊成功</h1>
             <h2 class="msg-welcome" id="display-welcome">歡迎 <span id="user-name">薛翔謙</span> 成為會員</h2>
             
-            <div class="btn-group">
+            <div class="btn-group" id="btn-container">
                 <a href="index.html" class="btn-custom btn-home"><i class="fa-solid fa-house"></i> 點選回首頁</a>
                 <a href="login.html" class="btn-custom btn-action" id="action-link"><i class="fa-solid fa-arrow-right-to-bracket"></i> 點選立即登入</a>
             </div>
 
-            <div class="timer-text">
+            <div class="timer-text" id="timer-container">
                 系統將在 <span id="sec">3</span> 秒後自動導向主頁面...
+            </div>
+            
+            <div id="review-container" style="display:none; margin-top: 25px; border-top: 2px dashed #eee; padding-top: 20px;">
+                <h3 style="color:#2F4F4F; font-weight:800; font-size:1.4rem; margin-bottom:15px;">請為本次購物體驗評分</h3>
+                <div class="stars" id="star-rating" style="font-size: 2.2rem; color: #ddd; cursor: pointer; margin-bottom: 15px; transition: 0.3s;">
+                    <i class="fa-solid fa-star" data-value="1"></i>
+                    <i class="fa-solid fa-star" data-value="2"></i>
+                    <i class="fa-solid fa-star" data-value="3"></i>
+                    <i class="fa-solid fa-star" data-value="4"></i>
+                    <i class="fa-solid fa-star" data-value="5"></i>
+                </div>
+                <textarea id="review-text" rows="3" placeholder="留下您的寶貴意見..." style="width:100%; padding:12px; border-radius:15px; border:2px solid #E0F6FF; margin-bottom:15px; font-family:inherit; resize:none; outline:none; transition:0.3s;"></textarea>
+                <button id="btn-submit-review" class="btn-custom btn-action" style="width:100%; justify-content:center; border:none; background:linear-gradient(90deg, #2ED573, #28b463); color:white; font-size:1.2rem; box-shadow: 0 4px 15px rgba(46, 213, 115, 0.4);">送出評價</button>
             </div>
         </div>
     </div>
@@ -181,11 +194,19 @@
         const actionLink = document.getElementById('action-link');
 
         // 根據來源變更顯示內容
+        let isCheckout = false;
         if (type === 'login') {
             titleEl.innerText = "會員登入成功";
             welcomeEl.innerHTML = `歡迎 <span style="color:#2F4F4F;">${name}</span> 回來`;
             actionLink.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> 前往購物車`;
             actionLink.href = "cart.html";
+        } else if (type === 'checkout') {
+            isCheckout = true;
+            titleEl.innerText = "訂單完成";
+            welcomeEl.innerHTML = `感謝 <span style="color:#2F4F4F;">${name}</span> 的購買`;
+            document.getElementById('btn-container').style.display = 'none';
+            document.getElementById('timer-container').style.display = 'none';
+            document.getElementById('review-container').style.display = 'block';
         } else {
             titleEl.innerText = "會員註冊成功";
             welcomeEl.innerHTML = `歡迎 <span style="color:#2F4F4F;">${name}</span> 成為會員`;
@@ -193,17 +214,64 @@
             actionLink.href = "login.html";
         }
 
-        // 自動跳轉倒數邏輯
-        let count = 3;
-        const secEl = document.getElementById('sec');
-        const timer = setInterval(() => {
-            count--;
-            secEl.innerText = count;
-            if (count <= 0) {
-                clearInterval(timer);
-                window.location.href = "index.html";
+        // 星星評分邏輯
+        let selectedRating = 0;
+        const stars = document.querySelectorAll('#star-rating i');
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function() {
+                let val = this.getAttribute('data-value');
+                stars.forEach(s => {
+                    s.style.color = s.getAttribute('data-value') <= val ? '#FFD700' : '#ddd';
+                });
+            });
+            star.addEventListener('mouseout', function() {
+                stars.forEach(s => {
+                    s.style.color = s.getAttribute('data-value') <= selectedRating ? '#FFD700' : '#ddd';
+                });
+            });
+            star.addEventListener('click', function() {
+                selectedRating = this.getAttribute('data-value');
+            });
+        });
+
+        // 評價送出邏輯
+        document.getElementById('btn-submit-review').addEventListener('click', () => {
+            if (selectedRating == 0) {
+                alert('請選擇星級評分！');
+                return;
             }
-        }, 1000);
+            const reviewText = document.getElementById('review-text').value;
+            const review = {
+                name: name,
+                rating: parseInt(selectedRating),
+                comment: reviewText,
+                timestamp: new Date().getTime()
+            };
+            
+            let reviews = JSON.parse(localStorage.getItem('dejeng_reviews')) || [];
+            reviews.push(review);
+            localStorage.setItem('dejeng_reviews', JSON.stringify(reviews));
+            
+            document.getElementById('review-container').innerHTML = '<h3 style="color:#2ED573; font-weight:bold; margin-top:20px;"><i class="fa-solid fa-heart"></i> 感謝您的評價！</h3>';
+            
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        });
+
+        // 自動跳轉倒數邏輯 (僅非 checkout 時)
+        if (!isCheckout) {
+            let count = 3;
+            const secEl = document.getElementById('sec');
+            const timer = setInterval(() => {
+                count--;
+                secEl.innerText = count;
+                if (count <= 0) {
+                    clearInterval(timer);
+                    window.location.href = "index.html";
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>

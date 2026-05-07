@@ -63,7 +63,7 @@
                     <li class="nav-item ms-3"><a class="nav-link fw-bold" href="database_demo.html" style="color: #e74c3c !important;"><i class="fa-solid fa-database"></i> 後台資料庫</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
-                    <span id="user-display" class="badge bg-info text-dark px-3 py-2" style="display:none; font-size: 0.95rem;"></span>
+                    <a href="profile.html" id="user-display" class="badge bg-info text-dark px-3 py-2 text-decoration-none" style="display:none; font-size: 0.95rem;"></a>
                     <a id="btn-login" class="btn btn-outline-dark rounded-pill px-4" href="login.html">登入</a>
                     <button id="btn-logout" class="btn btn-outline-danger rounded-pill px-4" style="display:none;">登出</button>
                 </div>
@@ -329,10 +329,8 @@
                 cart = [];
                 
                 setTimeout(() => { 
-                    renderCart(); 
-                    btn.innerHTML = '前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i>'; 
-                    btn.disabled = false; 
-                }, 2000); 
+                    window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName);
+                }, 1000); 
             }, 1500); 
         }
 

@@ -104,12 +104,12 @@
                 <li><a href="index.html#donuts"><i class="fa-solid fa-cookie"></i> 甜甜圈</a></li>
                 <li><a href="index.html#fruits"><i class="fa-solid fa-apple-whole"></i> 鮮果區</a></li>
                 <li><a href="leaderboard.html" style="color: #4682B4; font-weight: bold;"><i class="fa-solid fa-crown"></i> 排行榜</a></li>
-                <li><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> 購物車</a></li>
+                <li><a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> 購物車 <span id="cart-badge" style="background: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.75rem; vertical-align: top; display: none;">0</span></a></li>
                 
                 <li><a href="database_demo.html" style="color: #e74c3c; font-weight: bold;"><i class="fa-solid fa-database"></i> 資料庫</a></li>
 
                 <li id="nav-login"><a href="login.html"><i class="fa-solid fa-user"></i> 登入/註冊</a></li>
-                <li id="nav-user" style="display:none;"><a href="#" id="user-display" style="color:#1a73e8; font-weight:bold;"></a></li>
+                <li id="nav-user" style="display:none;"><a href="profile.html" id="user-display" style="color:#1a73e8; font-weight:bold;"></a></li>
                 <li id="nav-logout" style="display:none;"><a href="#" id="btn-logout" style="color:#e74c3c;">登出</a></li>
             </ul>
         </div>
@@ -274,9 +274,57 @@
             else { cart.push({ id: itemId, qty: 1, sugar: defSugar, ice: defIce }); }
             
             localStorage.setItem('dejeng_cart', JSON.stringify(cart));
+            updateCartBadge();
             alert(`商品已加入購物車！${alertMsg}`);
             window.location.href = "cart.html";
         }
+        
+        function updateCartBadge() {
+            let cart = JSON.parse(localStorage.getItem('dejeng_cart')) || [];
+            let totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            let badge = document.getElementById('cart-badge');
+            if(badge) {
+                if(totalQty > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = totalQty;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+        
+        function updateProductStatus() {
+            const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            
+            document.querySelectorAll('.rank-card').forEach(card => {
+                const nameNode = card.querySelector('.rank-name');
+                if(!nameNode) return;
+                const pName = nameNode.innerText.trim();
+                
+                let isSoldOut = inventory[pName] !== undefined && inventory[pName] <= 0;
+                let isDelisted = statusSettings[pName] && statusSettings[pName].status === 'delisted';
+                
+                if(isDelisted || isSoldOut) {
+                    const btn = card.querySelector('.btn-cart');
+                    if(btn) {
+                        btn.disabled = true;
+                        btn.style.background = '#888';
+                        btn.style.cursor = 'not-allowed';
+                        btn.style.boxShadow = 'none';
+                        btn.innerHTML = isDelisted ? '<i class="fa-solid fa-ban"></i> 已下架' : '<i class="fa-solid fa-ban"></i> 已完售';
+                    }
+                    
+                    const img = card.querySelector('.rank-img');
+                    if(img) {
+                        img.style.filter = 'grayscale(100%) opacity(0.6)';
+                    }
+                }
+            });
+        }
+        
+        updateCartBadge();
+        updateProductStatus();
 
         const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -20px 0px' };
         const observer = new IntersectionObserver((entries) => {

@@ -150,7 +150,7 @@
         /* 資料表共通 */
         .table-section { margin-bottom: 40px; }
         .table-card { background: rgba(255, 252, 248, 0.95); backdrop-filter: blur(8px); border-radius: 16px; border: 1px solid rgba(28, 43, 90, 0.1); overflow: hidden; box-shadow: 0 4px 16px rgba(28, 43, 90, 0.08); }
-        .table-header { padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(28, 43, 90, 0.1); background: rgba(28, 43, 90, 0.04); }
+        .table-header { padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(28, 43, 90, 0.1); background: rgba(28, 43, 90, 0.04); }
         .table-header h4 { margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; color: var(--kon); }
         .record-count { background: rgba(28, 43, 90, 0.08); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; color: var(--text-muted);}
         
@@ -341,6 +341,24 @@
                     <!-- 動態產生 -->
                 </ul>
             </div>
+            
+            <!-- 顧客評價與數據分析 -->
+            <div class="list-card">
+                <div class="card-header-title">
+                    <span><i class="fa-solid fa-comments text-success me-2"></i> 顧客評價與數據分析</span>
+                    <span class="badge bg-success" style="font-size:0.8rem; font-weight:normal;">最新評價</span>
+                </div>
+                <div id="reviews-summary" style="text-align: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: 800; color: #2F4F4F;" id="review-avg">0.0</h3>
+                    <div style="color: #FFD700; font-size: 1.2rem;" id="review-stars-avg">
+                        <i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i>
+                    </div>
+                    <p style="color: #7A7775; font-size: 0.9rem; margin-top: 5px;" id="review-count">共 0 則評價</p>
+                </div>
+                <ul class="alert-list" id="reviews-list" style="max-height: 200px;">
+                    <!-- 動態產生 -->
+                </ul>
+            </div>
         </div>
 
         <!-- 訂單管理 -->
@@ -363,18 +381,19 @@
         <!-- 會員列表 -->
         <div class="table-section">
             <div class="table-card">
-                <div class="table-header">
+                <div class="table-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <h4><i class="fa-solid fa-users text-primary me-2"></i> 會員列表 (Member Table)</h4>
+                    <button class="btn btn-sm btn-outline-danger" onclick="viewMemberPasswords(this)"><i class="fa-solid fa-unlock-keyhole"></i> 檢視密碼</button>
                 </div>
                 <div class="table-responsive">
                     <table class="table">
-                        <thead><tr><th>ID</th><th>帳號</th><th>姓名</th><th>電話</th><th>等級</th></tr></thead>
+                        <thead><tr><th>ID</th><th>帳號</th><th>姓名</th><th>電話</th><th>等級</th><th>密碼</th></tr></thead>
                         <tbody>
-                            <tr><td>1</td><td>sjjwyn@gmail.com</td><td>陳大明</td><td>0912-345-678</td><td><span class="status-badge rank-silver">Silver</span></td></tr>
-                            <tr><td>2</td><td>a113280055@gm.usc.edu.tw</td><td>薛翔謙</td><td>0952-702-813</td><td><span class="status-badge rank-diamond"><i class="fa-solid fa-gem"></i> Diamond</span></td></tr>
-                            <tr><td>3</td><td>fuwayde@gmail.com</td><td>傅小華</td><td>0922-111-222</td><td><span class="status-badge rank-silver">Silver</span></td></tr>
-                            <tr><td>4</td><td>hans950501@gmail.com</td><td>王漢斯</td><td>0933-555-666</td><td><span class="status-badge rank-silver">Silver</span></td></tr>
-                            <tr><td>5</td><td>brown157506@gmail.com</td><td>李布朗</td><td>0977-888-999</td><td><span class="status-badge rank-silver">Silver</span></td></tr>
+                            <tr><td>1</td><td>sjjwyn@gmail.com</td><td>陳大明</td><td>0912-345-678</td><td><span class="status-badge rank-silver">Silver</span></td><td><span class="member-pwd" data-pwd="000000">******</span></td></tr>
+                            <tr><td>2</td><td>a113280055@gm.usc.edu.tw</td><td>薛翔謙</td><td>0952-702-813</td><td><span class="status-badge rank-diamond"><i class="fa-solid fa-gem"></i> Diamond</span></td><td><span class="member-pwd" data-pwd="000000">******</span></td></tr>
+                            <tr><td>3</td><td>fuwayde@gmail.com</td><td>傅小華</td><td>0922-111-222</td><td><span class="status-badge rank-silver">Silver</span></td><td><span class="member-pwd" data-pwd="000000">******</span></td></tr>
+                            <tr><td>4</td><td>hans950501@gmail.com</td><td>王漢斯</td><td>0933-555-666</td><td><span class="status-badge rank-silver">Silver</span></td><td><span class="member-pwd" data-pwd="000000">******</span></td></tr>
+                            <tr><td>5</td><td>brown157506@gmail.com</td><td>李布朗</td><td>0977-888-999</td><td><span class="status-badge rank-silver">Silver</span></td><td><span class="member-pwd" data-pwd="000000">******</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -500,6 +519,35 @@
             }
         }
         document.getElementById('admin-pwd').addEventListener('keypress', e => { if (e.key === 'Enter') checkPassword(); });
+
+        let isPwdVisible = false;
+        window.viewMemberPasswords = function(btn) {
+            if (isPwdVisible) {
+                const pwdSpans = document.querySelectorAll('.member-pwd');
+                pwdSpans.forEach(span => {
+                    span.innerText = '******';
+                    span.style.color = 'inherit';
+                    span.style.fontWeight = 'normal';
+                });
+                btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> 檢視密碼';
+                isPwdVisible = false;
+                return;
+            }
+
+            let pwd = prompt('這屬於機密資料，請輸入管理員密碼：');
+            if (pwd === '000000') {
+                const pwdSpans = document.querySelectorAll('.member-pwd');
+                pwdSpans.forEach(span => {
+                    span.innerText = span.getAttribute('data-pwd');
+                    span.style.color = '#e74c3c';
+                    span.style.fontWeight = 'bold';
+                });
+                btn.innerHTML = '<i class="fa-solid fa-lock"></i> 隱藏密碼';
+                isPwdVisible = true;
+            } else if (pwd !== null) {
+                alert('密碼錯誤！無法檢視。');
+            }
+        };
 
         // 手機版選單
         const navbarToggle = document.getElementById('navbarToggle');
@@ -707,9 +755,135 @@
             document.getElementById('stock-alert-list').innerHTML = alertHtml;
             document.getElementById('kpi-restock-count').innerText = alertCount;
 
+            // 儲存計算出的庫存供前台使用
+            localStorage.setItem('dejeng_computed_inventory', JSON.stringify(inventory));
+
             // 繪製圖表
             const chartData = past30Days.map(date => dailyRevenue[date]);
             renderChart(past30Days, chartData);
+            
+            // 處理顧客評價
+            renderReviews();
+            
+            // 處理產品上下架機制 (動態加入按鈕與背景)
+            renderProductTableStatus();
+        }
+        
+        function renderReviews() {
+            const reviews = JSON.parse(localStorage.getItem('dejeng_reviews')) || [];
+            let avgRating = 0;
+            let html = '';
+            
+            if(reviews.length > 0) {
+                const totalStars = reviews.reduce((sum, r) => sum + r.rating, 0);
+                avgRating = (totalStars / reviews.length).toFixed(1);
+                
+                // 渲染星星
+                let starsHtml = '';
+                for(let i=1; i<=5; i++) {
+                    if(i <= Math.round(avgRating)) starsHtml += '<i class="fa-solid fa-star"></i>';
+                    else starsHtml += '<i class="fa-regular fa-star"></i>';
+                }
+                document.getElementById('review-stars-avg').innerHTML = starsHtml;
+                document.getElementById('review-avg').innerText = avgRating;
+                document.getElementById('review-count').innerText = `共 ${reviews.length} 則評價`;
+                
+                reviews.slice().reverse().forEach(r => {
+                    let rStars = '';
+                    for(let i=1; i<=5; i++) {
+                        rStars += i <= r.rating ? '<i class="fa-solid fa-star text-warning"></i>' : '<i class="fa-regular fa-star text-muted"></i>';
+                    }
+                    html += `
+                        <li class="alert-item" style="flex-direction: column; align-items: flex-start;">
+                            <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
+                                <span style="font-weight:bold;"><i class="fa-solid fa-user-circle text-info"></i> ${r.name}</span>
+                                <span>${rStars}</span>
+                            </div>
+                            <div style="color: #555; font-size: 0.9rem; background: rgba(28,43,90,0.05); padding: 8px; border-radius: 8px; width:100%;">
+                                ${r.comment || '無留言'}
+                            </div>
+                        </li>
+                    `;
+                });
+            } else {
+                html = '<li style="text-align:center; padding: 20px; color:var(--text-muted);">目前尚無評價。</li>';
+            }
+            document.getElementById('reviews-list').innerHTML = html;
+        }
+
+        function renderProductTableStatus() {
+            // 找到產品資料表
+            const tableHeaders = document.querySelectorAll('.table-header h4');
+            let targetTableBody = null;
+            let targetTableHead = null;
+            
+            for(let th of tableHeaders) {
+                if(th.innerText.includes('產品資料表')) {
+                    const table = th.closest('.table-card').querySelector('table');
+                    targetTableHead = table.querySelector('thead tr');
+                    targetTableBody = table.querySelector('tbody');
+                    break;
+                }
+            }
+            
+            if(!targetTableHead || !targetTableBody) return;
+            
+            // 加入表頭
+            if(!targetTableHead.innerHTML.includes('狀態操作')) {
+                const th = document.createElement('th');
+                th.innerText = '狀態操作';
+                targetTableHead.appendChild(th);
+            }
+            
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
+            
+            const rows = targetTableBody.querySelectorAll('tr');
+            rows.forEach((row, idx) => {
+                const nameCell = row.querySelectorAll('td')[1];
+                if(!nameCell) return;
+                const pName = nameCell.innerText.trim();
+                
+                // 動態更新庫存顯示
+                const inventoryCell = row.querySelectorAll('td')[5];
+                if(inventoryCell && inventory[pName] !== undefined) {
+                    inventoryCell.innerText = inventory[pName];
+                }
+                
+                const isDelisted = statusSettings[pName] && statusSettings[pName].status === 'delisted';
+                
+                if(isDelisted) {
+                    row.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                } else {
+                    row.style.backgroundColor = '';
+                }
+                
+                // 加入操作按鈕
+                let actionCell = row.querySelector('.product-action-td');
+                if(!actionCell) {
+                    actionCell = document.createElement('td');
+                    actionCell.className = 'product-action-td';
+                    row.appendChild(actionCell);
+                }
+                
+                if(isDelisted) {
+                    actionCell.innerHTML = `<button class="btn btn-sm btn-success" onclick="toggleProductStatus('${pName}', 'relist')"><i class="fa-solid fa-arrow-up"></i> 重新上架</button>`;
+                } else {
+                    actionCell.innerHTML = `<button class="btn btn-sm btn-danger" onclick="toggleProductStatus('${pName}', 'delist')"><i class="fa-solid fa-arrow-down"></i> 下架</button>`;
+                }
+            });
+        }
+        
+        window.toggleProductStatus = function(pName, action) {
+            let statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            if(action === 'delist') {
+                if(!statusSettings[pName]) statusSettings[pName] = {};
+                statusSettings[pName].status = 'delisted';
+            } else {
+                if(statusSettings[pName]) statusSettings[pName].status = 'normal';
+            }
+            localStorage.setItem('dejeng_product_settings', JSON.stringify(statusSettings));
+            renderProductTableStatus();
         }
 
 
