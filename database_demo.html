@@ -502,9 +502,12 @@
         document.getElementById('admin-pwd').addEventListener('keypress', e => { if (e.key === 'Enter') checkPassword(); });
 
         // 手機版選單
-        document.getElementById('navbarToggle').addEventListener('click', () => {
-            document.getElementById('navbarMenu').classList.toggle('active');
-        });
+        const navbarToggle = document.getElementById('navbarToggle');
+        if (navbarToggle) {
+            navbarToggle.addEventListener('click', () => {
+                document.getElementById('navbarMenu').classList.toggle('active');
+            });
+        }
 
         // 滾動到庫存區塊
         function scrollToStock() {
