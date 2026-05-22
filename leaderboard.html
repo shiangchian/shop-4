@@ -88,6 +88,13 @@
         .social-links a { text-decoration: none; color: #505965; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; transition: all 0.3s ease; background: rgba(72, 201, 176, 0.1); display: inline-flex; align-items: center; }
         .social-links a:hover { background: linear-gradient(135deg, #48C9B0 0%, #1ABC9C 100%); color: white; transform: translateY(-2px); }
         .social-logo { width: 20px; height: 20px; margin-right: 8px; }
+        
+        /* SALE 徽章動畫 */
+        @keyframes pulse-sale {
+            0% { transform: scale(1); box-shadow: 0 4px 8px rgba(255, 65, 108, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 14px rgba(255, 65, 108, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 4px 8px rgba(255, 65, 108, 0.4); }
+        }
     </style>
 </head>
 <body>
@@ -293,8 +300,67 @@
             }
         }
         
+        function syncInventory() {
+            let baseInventory = JSON.parse(localStorage.getItem('dejeng_base_inventory')) || {};
+            let baseInvUpdated = false;
+            
+            const allProducts = [
+                "水之森玄米抹茶", "英倫伯爵紅茶", "珍珠鮮奶", "手炒黑糖鮮奶", "嫩仙草凍奶", 
+                "海鹽芒果綠", "琥珀高峰烏龍", "茉香綠茶拿鐵", "芋頭鮮奶", "果漾微甜氣泡飲", 
+                "經典冰水果茶", "季節限定特調", "招牌綜合果茶", "焙烏龍鮮奶", "柚見冰茶", 
+                "蜜桃春烏龍", "芝士奶蓋紅茶", "桂花烏龍凍飲", "蜜糖波堤", "雙層巧克力波堤", 
+                "草莓波堤", "經典糖霜甜甜圈", "巧克力脆片波堤", "草莓夾心甜甜圈", "抹茶巧貝", 
+                "鮮甜愛文芒果", "清香麻豆文旦", "活力陽光香蕉", "嚴選進口紅櫻桃", "清脆鮮切小黃瓜", 
+                "紐西蘭奇異果", "鮮甜多汁水蜜桃", "屏東金鑽鳳梨", "屏東黑珍珠蓮霧", "沁涼紅肉西瓜盤", 
+                "屏東無籽綠檸檬", "清脆甜水梨"
+            ];
+            
+            allProducts.forEach(name => {
+                if (baseInventory[name] === undefined) {
+                    baseInventory[name] = Math.floor(Math.random() * 101) + 20; // 隨機庫存 20-120
+                    baseInvUpdated = true;
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            const computedInventory = {};
+            for (let name in baseInventory) {
+                computedInventory[name] = baseInventory[name];
+            }
+            
+            orders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(itemStr => {
+                        const match = itemStr.match(/(.*?)(?:\s*\(.*?\))?\s*x(\d+)/);
+                        if (match) {
+                            const pName = match[1].trim();
+                            const pQty = parseInt(match[2]);
+                            if (computedInventory[pName] !== undefined) {
+                                computedInventory[pName] -= pQty;
+                            } else {
+                                baseInventory[pName] = Math.floor(Math.random() * 101) + 20;
+                                baseInvUpdated = true;
+                                computedInventory[pName] = baseInventory[pName] - pQty;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            localStorage.setItem('dejeng_computed_inventory', JSON.stringify(computedInventory));
+            return computedInventory;
+        }
+
         function updateProductStatus() {
-            const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
+            const inventory = syncInventory();
             const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
             
             document.querySelectorAll('.rank-card').forEach(card => {
@@ -318,6 +384,83 @@
                     const img = card.querySelector('.rank-img');
                     if(img) {
                         img.style.filter = 'grayscale(100%) opacity(0.6)';
+                    }
+                }
+
+                // Render stock badge in leaderboard
+                let stock = inventory[pName] !== undefined ? inventory[pName] : 100;
+                let stockEl = card.querySelector('.rank-stock');
+                if (!stockEl) {
+                    stockEl = document.createElement('div');
+                    stockEl.className = 'rank-stock';
+                    stockEl.style.fontSize = '0.8rem';
+                    stockEl.style.fontWeight = '600';
+                    stockEl.style.marginTop = '8px';
+                    stockEl.style.padding = '4px 10px';
+                    stockEl.style.borderRadius = '12px';
+                    stockEl.style.display = 'inline-flex';
+                    stockEl.style.alignItems = 'center';
+                    stockEl.style.gap = '5px';
+                    stockEl.style.width = 'fit-content';
+                    
+                    const priceEl = card.querySelector('.rank-price');
+                    if (priceEl) {
+                        priceEl.parentNode.insertBefore(stockEl, priceEl.nextSibling);
+                    } else {
+                        card.querySelector('.rank-info').appendChild(stockEl);
+                    }
+                }
+                
+                if (isDelisted) {
+                    stockEl.style.color = '#7f8c8d';
+                    stockEl.style.backgroundColor = '#f0f3f4';
+                    stockEl.innerHTML = `<i class="fa-solid fa-box-archive"></i> 庫存: --`;
+                } else if (stock <= 0) {
+                    stockEl.style.color = '#e74c3c';
+                    stockEl.style.backgroundColor = '#fdedec';
+                    stockEl.innerHTML = `<i class="fa-solid fa-box-archive"></i> 庫存剩下: 0`;
+                } else if (stock <= 10) {
+                    stockEl.style.color = '#e67e22';
+                    stockEl.style.backgroundColor = '#fdf2e9';
+                    stockEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> 僅剩: ${stock}`;
+                } else {
+                    stockEl.style.color = '#27ae60';
+                    stockEl.style.backgroundColor = '#e8f8f5';
+                    stockEl.innerHTML = `<i class="fa-solid fa-box-open"></i> 庫存剩下: ${stock}`;
+                }
+
+                // 促銷特價顯示邏輯
+                const priceEl = card.querySelector('.rank-price');
+                if (priceEl) {
+                    if (!priceEl.dataset.originalPrice) {
+                        const origText = priceEl.innerText.trim();
+                        const numMatch = origText.match(/\d+/);
+                        if (numMatch) {
+                            priceEl.dataset.originalPrice = numMatch[0];
+                        }
+                    }
+                    const originalPrice = parseInt(priceEl.dataset.originalPrice, 10);
+                    const promoPrice = statusSettings[pName]?.promoPrice;
+                    
+                    let saleBadge = card.querySelector('.sale-badge');
+                    if (promoPrice && promoPrice < originalPrice) {
+                        priceEl.innerHTML = `<span style="text-decoration: line-through; color: #95a5a6; font-size: 0.95rem; margin-right: 8px;">NT$ ${originalPrice}</span><span style="color: #e74c3c; font-weight: bold; font-size: 1.4rem;">NT$ ${promoPrice}</span>`;
+                        
+                        if (!saleBadge && !isDelisted && !isSoldOut) {
+                            saleBadge = document.createElement('div');
+                            saleBadge.className = 'sale-badge';
+                            saleBadge.style = 'position: absolute; top: 15px; right: 15px; background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; z-index: 5; box-shadow: 0 4px 8px rgba(255, 65, 108, 0.4); border: 1px solid rgba(255,255,255,0.2); pointer-events: none; animation: pulse-sale 2s infinite;';
+                            saleBadge.innerHTML = `<i class="fa-solid fa-fire"></i> SALE`;
+                            card.style.position = 'relative';
+                            card.appendChild(saleBadge);
+                        }
+                    } else {
+                        priceEl.innerHTML = `NT$ ${originalPrice}`;
+                        if (saleBadge) saleBadge.remove();
+                    }
+                    
+                    if ((isDelisted || isSoldOut) && saleBadge) {
+                        saleBadge.remove();
                     }
                 }
             });

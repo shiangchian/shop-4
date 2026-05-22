@@ -52,6 +52,17 @@
         .btn-add-cart { background: linear-gradient(135deg, #5DADE2 0%, #4682B4 100%); color: white; border: none; padding: 18px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; box-shadow: 0 10px 20px rgba(93, 173, 226, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-add-cart:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(93, 173, 226, 0.4); }
 
+        .pd-stock {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 30px;
+            width: fit-content;
+        }
+
         @media (max-width: 900px) {
             .product-detail-container { flex-direction: column; }
             .image-section { padding: 3rem 2rem; } .image-section img { max-width: 250px; }
@@ -112,6 +123,7 @@
                 <h1 class="pd-title" id="pd-name">載入中...</h1>
                 <p class="pd-desc" id="pd-desc">商品描述載入中，請稍候...</p>
                 <div class="pd-price" id="pd-price">NT$ 0</div>
+                <div id="pd-stock" class="pd-stock" style="margin-bottom: 20px;"></div>
 
                 <div class="option-group" id="sugar-group">
                     <div class="option-title"><i class="fa-solid fa-spoon"></i> 甜度選擇</div>
@@ -216,6 +228,65 @@
     </script>
 
     <script>
+        function syncInventory() {
+            let baseInventory = JSON.parse(localStorage.getItem('dejeng_base_inventory')) || {};
+            let baseInvUpdated = false;
+            
+            const allProducts = [
+                "水之森玄米抹茶", "英倫伯爵紅茶", "珍珠鮮奶", "手炒黑糖鮮奶", "嫩仙草凍奶", 
+                "海鹽芒果綠", "琥珀高峰烏龍", "茉香綠茶拿鐵", "芋頭鮮奶", "果漾微甜氣泡飲", 
+                "經典冰水果茶", "季節限定特調", "招牌綜合果茶", "焙烏龍鮮奶", "柚見冰茶", 
+                "蜜桃春烏龍", "芝士奶蓋紅茶", "桂花烏龍凍飲", "蜜糖波堤", "雙層巧克力波堤", 
+                "草莓波堤", "經典糖霜甜甜圈", "巧克力脆片波堤", "草莓夾心甜甜圈", "抹茶巧貝", 
+                "鮮甜愛文芒果", "清香麻豆文旦", "活力陽光香蕉", "嚴選進口紅櫻桃", "清脆鮮切小黃瓜", 
+                "紐西蘭奇異果", "鮮甜多汁水蜜桃", "屏東金鑽鳳梨", "屏東黑珍珠蓮霧", "沁涼紅肉西瓜盤", 
+                "屏東無籽綠檸檬", "清脆甜水梨"
+            ];
+            
+            allProducts.forEach(name => {
+                if (baseInventory[name] === undefined) {
+                    baseInventory[name] = Math.floor(Math.random() * 101) + 20; // 隨機庫存 20-120
+                    baseInvUpdated = true;
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            const computedInventory = {};
+            for (let name in baseInventory) {
+                computedInventory[name] = baseInventory[name];
+            }
+            
+            orders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(itemStr => {
+                        const match = itemStr.match(/(.*?)(?:\s*\(.*?\))?\s*x(\d+)/);
+                        if (match) {
+                            const pName = match[1].trim();
+                            const pQty = parseInt(match[2]);
+                            if (computedInventory[pName] !== undefined) {
+                                computedInventory[pName] -= pQty;
+                            } else {
+                                baseInventory[pName] = Math.floor(Math.random() * 101) + 20;
+                                baseInvUpdated = true;
+                                computedInventory[pName] = baseInventory[pName] - pQty;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            localStorage.setItem('dejeng_computed_inventory', JSON.stringify(computedInventory));
+            return computedInventory;
+        }
+
         function selectPill(element, containerId) {
             const container = document.getElementById(containerId);
             const pills = container.getElementsByClassName('pill');
@@ -283,14 +354,30 @@
                 document.getElementById('pd-image').src = pd.img;
                 document.getElementById('pd-name').innerText = pd.name;
                 document.getElementById('pd-desc').innerText = pd.desc;
-                document.getElementById('pd-price').innerText = `NT$ ${pd.price}`;
+                
+                // 檢查特價
+                const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+                const promoPrice = statusSettings[pd.name]?.promoPrice;
+                if (promoPrice && promoPrice < pd.price) {
+                    document.getElementById('pd-price').innerHTML = `
+                        <span style="text-decoration: line-through; color: #95a5a6; font-size: 1.4rem; margin-right: 10px;">NT$ ${pd.price}</span>
+                        <span style="color: #e74c3c; font-weight: bold;">NT$ ${promoPrice}</span>
+                    `;
+                    const badge = document.getElementById('pd-badge');
+                    badge.innerHTML = `<i class="fa-solid fa-fire"></i> 限時特價中`;
+                    badge.style.background = 'linear-gradient(135deg, #ff416c, #ff4b2b)';
+                } else {
+                    document.getElementById('pd-price').innerText = `NT$ ${pd.price}`;
+                }
                 
                 // 動態判斷是否顯示冰塊甜度
                 if (!productId.startsWith('tea')) {
                     document.getElementById('sugar-group').style.display = 'none';
                     document.getElementById('ice-group').style.display = 'none';
-                    document.getElementById('pd-badge').innerText = '嚴選鮮果 / 手作甜點';
-                    document.getElementById('pd-badge').style.background = '#2ECC71';
+                    if (!(promoPrice && promoPrice < pd.price)) {
+                        document.getElementById('pd-badge').innerText = '嚴選鮮果 / 手作甜點';
+                        document.getElementById('pd-badge').style.background = '#2ECC71';
+                    }
                 }
 
                 document.getElementById('add-to-cart-btn').addEventListener('click', () => {
@@ -317,8 +404,7 @@
                 });
                 
                 // 檢查是否完售或下架
-                const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
-                const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+                const inventory = syncInventory();
                 
                 let isSoldOut = inventory[pd.name] !== undefined && inventory[pd.name] <= 0;
                 let isDelisted = statusSettings[pd.name] && statusSettings[pd.name].status === 'delisted';
@@ -329,6 +415,29 @@
                     btn.style.background = '#ccc';
                     btn.style.cursor = 'not-allowed';
                     btn.innerHTML = isDelisted ? '<i class="fa-solid fa-ban"></i> 此商品已下架' : '<i class="fa-solid fa-ban"></i> 已完售';
+                }
+
+                // Render stock badge
+                const stockVal = inventory[pd.name] !== undefined ? inventory[pd.name] : 100;
+                const stockEl = document.getElementById('pd-stock');
+                if(stockEl) {
+                    if (isDelisted) {
+                        stockEl.style.color = '#7f8c8d';
+                        stockEl.style.backgroundColor = '#f0f3f4';
+                        stockEl.innerHTML = `<i class="fa-solid fa-box-archive"></i> 商品狀態: 已下架`;
+                    } else if (stockVal <= 0) {
+                        stockEl.style.color = '#e74c3c';
+                        stockEl.style.backgroundColor = '#fdedec';
+                        stockEl.innerHTML = `<i class="fa-solid fa-box-archive"></i> 庫存剩下: 0 (已完售)`;
+                    } else if (stockVal <= 10) {
+                        stockEl.style.color = '#e67e22';
+                        stockEl.style.backgroundColor = '#fdf2e9';
+                        stockEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> 僅剩 ${stockVal} 件，欲購從速！`;
+                    } else {
+                        stockEl.style.color = '#27ae60';
+                        stockEl.style.backgroundColor = '#e8f8f5';
+                        stockEl.innerHTML = `<i class="fa-solid fa-box-open"></i> 商品庫存: ${stockVal} 件`;
+                    }
                 }
             } else {
                 alert('找不到該商品！將返回首頁。');

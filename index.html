@@ -63,11 +63,32 @@
         .social-links a:hover { background: linear-gradient(135deg, #48C9B0 0%, #1ABC9C 100%); color: white; transform: translateY(-2px); }
         .social-logo { width: 20px; height: 20px; margin-right: 8px; }
         
+        .mobile-member-display {
+            display: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #2F4F4F;
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 6px 12px;
+            border-radius: 15px;
+            white-space: nowrap;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
         @media (max-width: 768px) {
             .navbar-menu { display: none; flex-direction: column; background: #B0E0E6; position: absolute; top: 100%; left: 0; right: 0; width: 100%; padding: 10px 0; }
             .navbar-menu.active { display: flex; } .navbar-toggle { display: block; }
             .footer { padding: 3rem 1.5rem; grid-template-columns: 1fr; text-align: center; gap: 3rem; }
             .footer-section h3::after { left: 50%; transform: translateX(-50%); } .social-links { justify-content: center; }
+            
+            .navbar.logged-in .navbar-search-container {
+                display: none !important;
+            }
+            .navbar.logged-in .mobile-member-display {
+                display: flex !important;
+            }
         }
     </style>
 </head>
@@ -82,6 +103,7 @@
             <div class="navbar-search-container">
                 <input type="search" id="searchInput" class="navbar-search" placeholder="搜尋飲品、甜甜圈、水果...">
             </div>
+            <div id="mobile-member-display" class="mobile-member-display"></div>
             <button class="navbar-toggle" id="navbarToggle">☰</button>
             <ul class="navbar-menu" id="navbarMenu">
                 <li><a href="#drinks"><i class="fa-solid fa-mug-hot"></i> 飲品</a></li>
@@ -205,16 +227,28 @@
             const navUser = document.getElementById('nav-user');
             const navLogout = document.getElementById('nav-logout');
             const userDisplay = document.getElementById('user-display');
+            const navbar = document.querySelector('.navbar');
+            const mobileMemberDisplay = document.getElementById('mobile-member-display');
 
             if (user) {
                 navLogin.style.display = 'none';
                 navUser.style.display = 'block';
                 navLogout.style.display = 'block';
-                userDisplay.innerHTML = `<i class="fa-solid fa-user-check"></i> 會員 ${user.displayName || user.email.split('@')[0]}`;
+                const memberName = user.displayName || user.email.split('@')[0];
+                userDisplay.innerHTML = `<i class="fa-solid fa-user-check"></i> 會員 ${memberName}`;
+                if (mobileMemberDisplay) {
+                    mobileMemberDisplay.innerHTML = `<i class="fa-solid fa-user-check" style="color: #1a73e8;"></i> 會員:${memberName}`;
+                }
+                if (navbar) {
+                    navbar.classList.add('logged-in');
+                }
             } else {
                 navLogin.style.display = 'block';
                 navUser.style.display = 'none';
                 navLogout.style.display = 'none';
+                if (navbar) {
+                    navbar.classList.remove('logged-in');
+                }
             }
         });
 
@@ -255,8 +289,67 @@
             }
         }
         
+        function syncInventory() {
+            let baseInventory = JSON.parse(localStorage.getItem('dejeng_base_inventory')) || {};
+            let baseInvUpdated = false;
+            
+            const allProducts = [
+                "水之森玄米抹茶", "英倫伯爵紅茶", "珍珠鮮奶", "手炒黑糖鮮奶", "嫩仙草凍奶", 
+                "海鹽芒果綠", "琥珀高峰烏龍", "茉香綠茶拿鐵", "芋頭鮮奶", "果漾微甜氣泡飲", 
+                "經典冰水果茶", "季節限定特調", "招牌綜合果茶", "焙烏龍鮮奶", "柚見冰茶", 
+                "蜜桃春烏龍", "芝士奶蓋紅茶", "桂花烏龍凍飲", "蜜糖波堤", "雙層巧克力波堤", 
+                "草莓波堤", "經典糖霜甜甜圈", "巧克力脆片波堤", "草莓夾心甜甜圈", "抹茶巧貝", 
+                "鮮甜愛文芒果", "清香麻豆文旦", "活力陽光香蕉", "嚴選進口紅櫻桃", "清脆鮮切小黃瓜", 
+                "紐西蘭奇異果", "鮮甜多汁水蜜桃", "屏東金鑽鳳梨", "屏東黑珍珠蓮霧", "沁涼紅肉西瓜盤", 
+                "屏東無籽綠檸檬", "清脆甜水梨"
+            ];
+            
+            allProducts.forEach(name => {
+                if (baseInventory[name] === undefined) {
+                    baseInventory[name] = Math.floor(Math.random() * 101) + 20; // 隨機庫存 20-120
+                    baseInvUpdated = true;
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            const computedInventory = {};
+            for (let name in baseInventory) {
+                computedInventory[name] = baseInventory[name];
+            }
+            
+            orders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(itemStr => {
+                        const match = itemStr.match(/(.*?)(?:\s*\(.*?\))?\s*x(\d+)/);
+                        if (match) {
+                            const pName = match[1].trim();
+                            const pQty = parseInt(match[2]);
+                            if (computedInventory[pName] !== undefined) {
+                                computedInventory[pName] -= pQty;
+                            } else {
+                                baseInventory[pName] = Math.floor(Math.random() * 101) + 20;
+                                baseInvUpdated = true;
+                                computedInventory[pName] = baseInventory[pName] - pQty;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            localStorage.setItem('dejeng_computed_inventory', JSON.stringify(computedInventory));
+            return computedInventory;
+        }
+        
         function updateProductStatus() {
-            const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
+            const inventory = syncInventory();
             const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
             
             document.querySelectorAll('.menu-item').forEach(item => {
@@ -301,6 +394,136 @@
                     btn.style.cursor = 'not-allowed';
                     btn.innerText = '已完售';
                 }
+
+                // New remaining stock badge display logic
+                let stock = inventory[pName] !== undefined ? inventory[pName] : 100;
+                let stockEl = item.querySelector('.menu-item-stock');
+                if (!stockEl) {
+                    stockEl = document.createElement('div');
+                    stockEl.className = 'menu-item-stock';
+                    stockEl.style.fontSize = '0.8rem';
+                    stockEl.style.fontWeight = '600';
+                    stockEl.style.marginBottom = '10px';
+                    stockEl.style.padding = '4px 10px';
+                    stockEl.style.borderRadius = '12px';
+                    stockEl.style.display = 'inline-flex';
+                    stockEl.style.alignItems = 'center';
+                    stockEl.style.gap = '5px';
+                    
+                    const priceEl = item.querySelector('.menu-item-price');
+                    if (priceEl) {
+                        priceEl.parentNode.insertBefore(stockEl, priceEl.nextSibling);
+                    } else {
+                        item.appendChild(stockEl);
+                    }
+                }
+                
+                if (isDelisted) {
+                    stockEl.style.color = '#7f8c8d';
+                    stockEl.style.backgroundColor = '#f0f3f4';
+                    stockEl.innerHTML = `<i class="fa-solid fa-box-archive"></i> 庫存: --`;
+                } else if (stock <= 0) {
+                    stockEl.style.color = '#e74c3c';
+                    stockEl.style.backgroundColor = '#fdedec';
+                    stockEl.innerHTML = `<i class="fa-solid fa-box-archive"></i> 庫存剩下: 0`;
+                } else if (stock <= 10) {
+                    stockEl.style.color = '#e67e22';
+                    stockEl.style.backgroundColor = '#fdf2e9';
+                    stockEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> 僅剩: ${stock}`;
+                } else {
+                    stockEl.style.color = '#27ae60';
+                    stockEl.style.backgroundColor = '#e8f8f5';
+                    stockEl.innerHTML = `<i class="fa-solid fa-box-open"></i> 庫存剩下: ${stock}`;
+                }
+
+                // 促銷特價顯示邏輯
+                const priceEl = item.querySelector('.menu-item-price');
+                if (priceEl) {
+                    if (!priceEl.dataset.originalPrice) {
+                        const origText = priceEl.innerText.trim();
+                        const numMatch = origText.match(/\d+/);
+                        if (numMatch) {
+                            priceEl.dataset.originalPrice = numMatch[0];
+                        }
+                    }
+                    const originalPrice = parseInt(priceEl.dataset.originalPrice, 10);
+                    const promoPrice = statusSettings[pName]?.promoPrice;
+                    
+                    let saleBadge = imageContainer.querySelector('.sale-badge');
+                    if (promoPrice && promoPrice < originalPrice) {
+                        priceEl.innerHTML = `<span style="text-decoration: line-through; color: #95a5a6; font-size: 0.9rem; margin-right: 5px;">NT$ ${originalPrice}</span><span style="color: #e74c3c; font-weight: bold; font-size: 1.15rem;">NT$ ${promoPrice}</span>`;
+                        
+                        if (!saleBadge && !isDelisted && !isSoldOut) {
+                            saleBadge = document.createElement('div');
+                            saleBadge.className = 'sale-badge';
+                            saleBadge.style = 'position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; z-index: 5; box-shadow: 0 4px 8px rgba(255, 65, 108, 0.4); border: 1px solid rgba(255,255,255,0.2); pointer-events: none; animation: pulse-sale 2s infinite;';
+                            saleBadge.innerHTML = `<i class="fa-solid fa-fire"></i> SALE`;
+                            imageContainer.style.position = 'relative';
+                            imageContainer.appendChild(saleBadge);
+                        }
+                    } else {
+                        priceEl.innerHTML = `NT$ ${originalPrice}`;
+                        if (saleBadge) saleBadge.remove();
+                    }
+                    
+                    // 如果商品已下架或已完售，應移除 SALE 徽章以免干擾畫面
+                    if ((isDelisted || isSoldOut) && saleBadge) {
+                        saleBadge.remove();
+                    }
+                }
+            });
+
+            // 將特價商品排列在最上面
+            document.querySelectorAll('.menu-grid').forEach(grid => {
+                const items = Array.from(grid.querySelectorAll('.menu-item'));
+                
+                // 先給每個 item 標記一個初始 index，便於穩定排序
+                items.forEach((item, index) => {
+                    if (item.dataset.originalIndex === undefined) {
+                        item.dataset.originalIndex = index;
+                    }
+                });
+
+                items.sort((a, b) => {
+                    const nameA = a.querySelector('.menu-item-name')?.innerText.trim() || '';
+                    const nameB = b.querySelector('.menu-item-name')?.innerText.trim() || '';
+                    
+                    const priceElA = a.querySelector('.menu-item-price');
+                    const priceElB = b.querySelector('.menu-item-price');
+                    const origA = priceElA ? (parseInt(priceElA.dataset.originalPrice, 10) || 0) : 0;
+                    const origB = priceElB ? (parseInt(priceElB.dataset.originalPrice, 10) || 0) : 0;
+                    
+                    const promoA = parseInt(statusSettings[nameA]?.promoPrice, 10) || 0;
+                    const promoB = parseInt(statusSettings[nameB]?.promoPrice, 10) || 0;
+                    
+                    const isDelistedA = statusSettings[nameA] && statusSettings[nameA].status === 'delisted';
+                    const isDelistedB = statusSettings[nameB] && statusSettings[nameB].status === 'delisted';
+                    const stockA = inventory[nameA] !== undefined ? inventory[nameA] : 100;
+                    const stockB = inventory[nameB] !== undefined ? inventory[nameB] : 100;
+                    const isSoldOutA = stockA <= 0;
+                    const isSoldOutB = stockB <= 0;
+                    
+                    // 只有未下架且未售罄的促銷特價才是「有效特價」
+                    const isSaleActiveA = (promoA && promoA < origA && !isDelistedA && !isSoldOutA) ? 1 : 0;
+                    const isSaleActiveB = (promoB && promoB < origB && !isDelistedB && !isSoldOutB) ? 1 : 0;
+                    
+                    if (isSaleActiveA !== isSaleActiveB) {
+                        return isSaleActiveB - isSaleActiveA; // 特價商品排前面
+                    }
+                    
+                    // 如果兩者特價狀態相同，則再判斷是否可售 (未下架且未售罄的排在前面)
+                    const isAvailableA = (!isDelistedA && !isSoldOutA) ? 1 : 0;
+                    const isAvailableB = (!isDelistedB && !isSoldOutB) ? 1 : 0;
+                    if (isAvailableA !== isAvailableB) {
+                        return isAvailableB - isAvailableA;
+                    }
+                    
+                    // 最後保持原有順序
+                    return parseInt(a.dataset.originalIndex, 10) - parseInt(b.dataset.originalIndex, 10);
+                });
+                
+                // 重新放入 DOM
+                items.forEach(item => grid.appendChild(item));
             });
         }
         

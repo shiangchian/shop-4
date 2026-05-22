@@ -15,7 +15,56 @@
         .brand-logo img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
         .cart-item { background: white; border: 1px solid #ddd; border-radius: 15px; padding: 20px; margin-bottom: 20px; transition: 0.3s; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .cart-img { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-right: 15px; border: 1px solid #eee; }
-        .qty-input { background: #f8f9fa; border: 1px solid #ccc; width: 60px; text-align: center; border-radius: 5px; padding: 5px; font-weight: bold; }
+        /* 數量調整器樣式 */
+        .qty-selector {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 30px;
+            background: #f8f9fa;
+            padding: 2px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .qty-btn:hover:not(:disabled) {
+            background: #1ABC9C;
+            color: white;
+            transform: scale(1.05);
+        }
+        .qty-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .qty-btn:disabled {
+            background: #e9ecef;
+            color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .qty-display {
+            width: 40px;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #2F4F4F;
+            outline: none;
+        }
         .summary-card { background: white; border: 1px solid #ddd; border-radius: 15px; padding: 30px; position: sticky; top: 100px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; color: #555; font-size: 1.1rem; }
         .total-row { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 1.5rem; font-weight: bold; color: #1a73e8; }
@@ -48,6 +97,19 @@
             .cart-img { margin-right: 0; margin-bottom: 15px; width: 120px; height: 120px; }
             .text-end { text-align: center !important; margin-right: 0 !important; margin-top: 15px; }
             .trash-btn { margin-left: 0; margin-top: 15px; }
+        }
+        
+        /* SALE 徽章與特價樣式 */
+        @keyframes pulse-sale {
+            0% { transform: scale(1); box-shadow: 0 4px 6px rgba(255, 65, 108, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 12px rgba(255, 65, 108, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 4px 6px rgba(255, 65, 108, 0.3); }
+        }
+        .animate-pulse-sale {
+            animation: pulse-sale 2s infinite;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b) !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white !important;
         }
     </style>
 </head>
@@ -208,6 +270,7 @@
             const container = document.getElementById('cart-items-container');
             const emptyState = document.getElementById('empty-state');
             const cartContent = document.getElementById('cart-content');
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
 
             if (cart.length > 0) {
                 emptyState.style.display = 'none';
@@ -220,7 +283,11 @@
                     const p = productsDB[item.id];
                     if(!p) return; 
                     
-                    const itemTotal = p.price * item.qty;
+                    const promoPrice = statusSettings[p.name]?.promoPrice;
+                    const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
+                    const isPromo = (promoPrice && promoPrice < p.price);
+                    
+                    const itemTotal = currentPrice * item.qty;
                     total += itemTotal;
                     totalCups += parseInt(item.qty);
 
@@ -231,16 +298,39 @@
                         badgeHtml = `<span class="badge bg-success">手工現做 / 嚴選鮮切</span>`;
                     }
 
+                    const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
+                    const maxAvailable = inventory[p.name] !== undefined ? inventory[p.name] : 100;
+                    const isMinusDisabled = item.qty <= 1 ? 'disabled' : '';
+                    const isPlusDisabled = item.qty >= maxAvailable ? 'disabled' : '';
+
                     html += `
-                    <div class="cart-item">
+                    <div class="cart-item" style="${isPromo ? 'border-left: 4px solid #e74c3c;' : ''}">
                         <img src="${p.img}" alt="${p.name}" class="cart-img">
                         <div class="flex-grow-1">
-                            <h5 class="mb-1 fw-bold">${p.name}</h5>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="mb-0 fw-bold">${p.name}</h5>
+                                ${isPromo ? `<span class="badge animate-pulse-sale" style="font-size:0.75rem; padding: 3px 8px; border-radius: 12px;">SALE</span>` : ''}
+                            </div>
                             <p class="text-muted small mb-0">${badgeHtml}</p>
                         </div>
                         <div class="text-end me-4">
-                            <div class="mb-2 fw-bold text-primary fs-5">$<span class="price">${p.price}</span></div>
-                            <input type="number" class="qty-input" value="${item.qty}" min="1" onchange="updateQty(${index}, this.value)">
+                            <div class="mb-2 fw-bold fs-5">
+                                ${isPromo ? `
+                                    <span style="text-decoration: line-through; color: #95a5a6; font-size: 0.85rem; margin-right: 5px;">$${p.price}</span>
+                                    <span style="color: #e74c3c; font-weight: bold;">$${promoPrice}</span>
+                                ` : `
+                                    <span class="text-primary">$${p.price}</span>
+                                `}
+                            </div>
+                            <div class="qty-selector">
+                                <button class="qty-btn" onclick="adjustQty(${index}, -1)" ${isMinusDisabled} title="減少數量">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                                <input type="text" class="qty-display" value="${item.qty}" readonly>
+                                <button class="qty-btn" onclick="adjustQty(${index}, 1)" ${isPlusDisabled} title="增加數量">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                         <button class="trash-btn" onclick="removeItem(${index})" title="移除商品"><i class="fa-solid fa-trash-can"></i></button>
                     </div>`;
@@ -259,6 +349,26 @@
         window.updateQty = function(index, newQty) {
             if(newQty < 1) newQty = 1;
             cart[index].qty = parseInt(newQty);
+            localStorage.setItem('dejeng_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        window.adjustQty = function(index, amount) {
+            const item = cart[index];
+            const p = productsDB[item.id];
+            if(!p) return;
+            
+            const inventory = JSON.parse(localStorage.getItem('dejeng_computed_inventory')) || {};
+            const maxAvailable = inventory[p.name] !== undefined ? inventory[p.name] : 100;
+            
+            let newQty = parseInt(item.qty) + amount;
+            if(newQty < 1) newQty = 1;
+            if(newQty > maxAvailable) {
+                newQty = maxAvailable;
+                alert(`抱歉，【${p.name}】目前庫存僅剩 ${maxAvailable} 份！`);
+            }
+            
+            cart[index].qty = newQty;
             localStorage.setItem('dejeng_cart', JSON.stringify(cart));
             renderCart();
         }
@@ -292,12 +402,15 @@
             setTimeout(() => { 
                 let total = 0;
                 let purchasedItems = []; // 準備用來裝商品明細
+                const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
 
                 // 1. 計算金額並打包商品名稱
                 cart.forEach(item => {
                     const p = productsDB[item.id];
                     if(p) {
-                        total += (p.price * item.qty);
+                        const promoPrice = statusSettings[p.name]?.promoPrice;
+                        const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
+                        total += (currentPrice * item.qty);
                         // 如果有甜度冰塊，把它加在名字後面
                         let spec = (item.sugar !== '--' && item.ice !== '--') ? ` (${item.sugar}/${item.ice})` : '';
                         purchasedItems.push(`${p.name}${spec} x${item.qty}`);
