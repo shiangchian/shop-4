@@ -75,6 +75,14 @@
             align-items: center;
             gap: 5px;
             border: 1px solid rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .mobile-member-display:hover {
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            color: #1a73e8;
         }
 
         @media (max-width: 768px) {
@@ -103,7 +111,7 @@
             <div class="navbar-search-container">
                 <input type="search" id="searchInput" class="navbar-search" placeholder="搜尋飲品、甜甜圈、水果...">
             </div>
-            <div id="mobile-member-display" class="mobile-member-display"></div>
+            <a href="profile.html" id="mobile-member-display" class="mobile-member-display"></a>
             <button class="navbar-toggle" id="navbarToggle">☰</button>
             <ul class="navbar-menu" id="navbarMenu">
                 <li><a href="#drinks"><i class="fa-solid fa-mug-hot"></i> 飲品</a></li>

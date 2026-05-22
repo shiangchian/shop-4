@@ -9,37 +9,189 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { 
-            background: linear-gradient(135deg, #f4f6f8 0%, #e0e8f0 100%); 
+            background: radial-gradient(circle at 10% 20%, rgba(224, 238, 250, 0.4) 0%, rgba(244, 246, 248, 1) 90.1%); 
             font-family: 'Noto Sans TC', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            color: #334155;
         }
         
-        .navbar { background: #B0E0E6; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-        .navbar-brand { font-size: 1.5rem; font-weight: bold; color: #2F4F4F; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .navbar-brand img { width: 40px; height: 40px; }
+        /* Navbar Glassmorphism */
+        .navbar { 
+            background: rgba(176, 224, 230, 0.8); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 20px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand { 
+            font-size: 1.45rem; 
+            font-weight: 800; 
+            color: #2F4F4F; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            letter-spacing: 0.5px;
+        }
+        .navbar-brand img { 
+            width: 38px; 
+            height: 38px; 
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-nav-action {
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-home {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #334155;
+        }
+        
+        .btn-home:hover {
+            background: #ffffff;
+            border-color: #4682B4;
+            color: #4682B4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(70, 130, 180, 0.15);
+        }
+        
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        
+        .btn-logout:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(239, 68, 68, 0.2);
+        }
         
         .profile-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: #fff;
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            flex-grow: 1;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            transition: box-shadow 0.3s ease;
+        }
+        .profile-container:hover {
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
         }
 
-        .profile-header { text-align: center; margin-bottom: 30px; }
-        .profile-icon { font-size: 4rem; color: #4682B4; margin-bottom: 15px; }
+        .profile-header { text-align: center; margin-bottom: 35px; }
+        .profile-icon { 
+            font-size: 3.5rem; 
+            color: #4682B4; 
+            margin-bottom: 15px; 
+            background: #e6f7ff;
+            padding: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            line-height: 1;
+            box-shadow: 0 6px 15px rgba(70, 130, 180, 0.1);
+        }
         
-        .form-group { margin-bottom: 20px; }
-        .form-label { font-weight: 600; color: #2F4F4F; }
-        .form-control { border-radius: 10px; padding: 12px; background: #f4f6f8; border: 1px solid #dee2e6; }
-        .form-control:focus { border-color: #4682B4; box-shadow: 0 0 0 0.25rem rgba(70, 130, 180, 0.2); background: #ffffff; }
+        .form-group { margin-bottom: 24px; }
+        .form-label { font-weight: 600; color: #475569; font-size: 0.92rem; margin-bottom: 8px; display: block; }
+        .form-control { 
+            border-radius: 12px; 
+            padding: 12px 16px; 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            color: #334155;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        .form-control:disabled {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .form-control:focus { 
+            border-color: #4682B4; 
+            box-shadow: 0 0 0 4px rgba(70, 130, 180, 0.15); 
+            background: #ffffff; 
+        }
 
-        .btn-gradient { background: linear-gradient(135deg, #5DADE2 0%, #4682B4 100%); border: none; color: white; padding: 12px; font-weight: 700; border-radius: 50px; transition: 0.3s; width: 100%; margin-top: 10px; }
-        .btn-gradient:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(93, 173, 226, 0.3); color: white; }
+        .btn-gradient { 
+            background: linear-gradient(135deg, #5DADE2 0%, #4682B4 100%); 
+            border: none; 
+            color: white; 
+            padding: 14px; 
+            font-weight: 700; 
+            font-size: 1rem;
+            border-radius: 50px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            width: 100%; 
+            margin-top: 10px; 
+            box-shadow: 0 4px 12px rgba(70, 130, 180, 0.2);
+        }
+        .btn-gradient:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(70, 130, 180, 0.3); 
+            color: white; 
+        }
+        .btn-gradient:active {
+            transform: translateY(0);
+        }
+
+        /* 美化歷史訂單與滾動條 */
+        .profile-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .profile-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .profile-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .profile-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-left: 5px solid #4682B4 !important;
+            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+            border-left-color: #2F4F4F !important;
+        }
     </style>
 </head>
 <body>
@@ -50,34 +202,54 @@
                 <img src="image/logo.jpeg" alt="Logo"> 得正 dejeng
             </a>
             <div class="d-flex align-items-center">
-                <a href="index.html" class="btn btn-outline-dark rounded-pill px-4"><i class="fa-solid fa-house"></i> 回首頁</a>
-                <button id="btn-logout" class="btn btn-outline-danger rounded-pill px-4 ms-3" style="display:none;">登出</button>
+                <a href="index.html" class="btn-nav-action btn-home"><i class="fa-solid fa-house"></i> 回首頁</a>
+                <button id="btn-logout" class="btn-nav-action btn-logout ms-3" style="display:none;"><i class="fa-solid fa-right-from-bracket"></i> 登出</button>
             </div>
         </div>
     </nav>
 
-    <div class="container d-flex flex-column align-items-center">
-        <div class="profile-container w-100">
-            <div class="profile-header">
-                <i class="fa-solid fa-circle-user profile-icon"></i>
-                <h2 style="color: #2F4F4F; font-weight: 800;">會員中心</h2>
-                <p class="text-muted">管理您的帳號與密碼</p>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">登入信箱 (Email)</label>
-                <input type="text" id="user-email" class="form-control" disabled value="讀取中...">
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- 左側/上方：會員中心密碼修改 -->
+            <div class="col-lg-5">
+                <div class="profile-container w-100">
+                    <div class="profile-header">
+                        <i class="fa-solid fa-circle-user profile-icon"></i>
+                        <h2 style="color: #2F4F4F; font-weight: 800;">會員中心</h2>
+                        <p class="text-muted">管理您的帳號與密碼</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">登入信箱 (Email)</label>
+                        <input type="text" id="user-email" class="form-control" disabled value="讀取中...">
+                    </div>
+
+                    <hr class="my-4">
+                    <h4 style="color: #2F4F4F; font-weight: 700; margin-bottom: 20px;">修改密碼</h4>
+
+                    <div class="form-group">
+                        <label class="form-label">新密碼</label>
+                        <input type="password" id="new-password" class="form-control" placeholder="請輸入至少 6 位數新密碼">
+                    </div>
+
+                    <button id="btn-update-pwd" class="btn btn-gradient">確認修改密碼</button>
+                </div>
             </div>
 
-            <hr class="my-4">
-            <h4 style="color: #2F4F4F; font-weight: 700; margin-bottom: 20px;">修改密碼</h4>
-
-            <div class="form-group">
-                <label class="form-label">新密碼</label>
-                <input type="password" id="new-password" class="form-control" placeholder="請輸入至少 6 位數新密碼">
+            <!-- 右側/下方：歷史購買紀錄 -->
+            <div class="col-lg-7">
+                <div class="profile-container w-100" style="max-height: 80vh; overflow-y: auto;">
+                    <h3 style="color: #2F4F4F; font-weight: 800; margin-bottom: 25px;">
+                        <i class="fa-solid fa-clock-rotate-left text-info me-2"></i>歷史購買紀錄
+                    </h3>
+                    <div id="order-history-list">
+                        <div class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-spinner fa-spin fa-2x mb-3"></i>
+                            <p>載入訂單紀錄中...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <button id="btn-update-pwd" class="btn btn-gradient">確認修改密碼</button>
         </div>
     </div>
 
@@ -93,11 +265,93 @@
             if (user) {
                 document.getElementById('user-email').value = user.email;
                 document.getElementById('btn-logout').style.display = 'inline-block';
+                renderPurchaseHistory(user);
             } else {
                 alert('您尚未登入，請先登入！');
                 window.location.href = 'login.html';
             }
         });
+
+        function renderPurchaseHistory(user) {
+            const historyList = document.getElementById('order-history-list');
+            if (!historyList) return;
+
+            const memberName = user.displayName || user.email.split('@')[0];
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            
+            // Filter orders for this user
+            const userOrders = orders.filter(order => {
+                if (!order.customer) return false;
+                const custLower = order.customer.toLowerCase().trim();
+                const memberLower = memberName.toLowerCase().trim();
+                const emailLower = user.email.toLowerCase().trim();
+                
+                return custLower === memberLower || 
+                       custLower === emailLower || 
+                       custLower.includes(memberLower) ||
+                       custLower.includes(emailLower.split('@')[0]);
+            });
+
+            // Sort orders by timestamp descending
+            userOrders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            if (userOrders.length === 0) {
+                historyList.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-receipt text-muted mb-3" style="font-size: 3.5rem; opacity: 0.5;"></i>
+                        <p class="text-muted mb-3">您目前尚無購買紀錄</p>
+                        <a href="index.html" class="btn btn-outline-info rounded-pill px-4 btn-sm" style="font-weight: 500;">前去選購</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            userOrders.forEach((order, index) => {
+                const dateStr = order.timestamp ? new Date(order.timestamp).toLocaleString('zh-TW', { hour12: false }) : '未知時間';
+                const itemsHtml = order.items.map(item => {
+                    const lastXIdx = item.lastIndexOf(' x');
+                    let nameAndSpec = item;
+                    let qty = 1;
+                    if (lastXIdx !== -1) {
+                        nameAndSpec = item.substring(0, lastXIdx);
+                        qty = item.substring(lastXIdx + 2).trim();
+                    }
+                    return `
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2" style="background: transparent; font-size: 0.95rem; border-bottom: 1px dashed rgba(0,0,0,0.05) !important;">
+                            <span class="text-secondary">
+                                <i class="fa-solid fa-mug-hot text-info me-2" style="font-size: 0.85rem;"></i>
+                                <strong>${nameAndSpec}</strong>
+                            </span>
+                            <span class="badge bg-light text-dark rounded-pill border fw-bold px-2 py-1">x${qty}</span>
+                        </li>
+                    `;
+                }).join('');
+
+                const orderNum = userOrders.length - index;
+                html += `
+                    <div class="card border-0 shadow-sm mb-3 order-card" style="border-radius: 15px; overflow: hidden; background: #fafbfc; animation-delay: ${index * 0.08}s;">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span class="text-muted small d-block mb-1"><i class="fa-regular fa-clock me-1"></i>${dateStr}</span>
+                                    <span class="badge rounded-pill" style="font-size: 0.8rem; background-color: #E8F8F5; color: #117A65; padding: 4px 10px;">訂單 #${orderNum}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-muted small d-block">消費金額</span>
+                                    <span class="fw-bold text-primary" style="font-size: 1.25rem;">NT$ ${order.total}</span>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush mb-0 pt-2 border-top border-light-subtle">
+                                ${itemsHtml}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            });
+
+            historyList.innerHTML = html;
+        }
 
         document.getElementById('btn-logout').addEventListener('click', () => {
             if(confirm("確定要登出嗎？")) { 
