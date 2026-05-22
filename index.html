@@ -14,8 +14,74 @@
         /* Navbar Styles */
         .navbar { background: #B0E0E6; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
         .navbar-container { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-        .navbar-logo { display: flex; align-items: center; font-size: 1.5rem; font-weight: bold; color: #2F4F4F; text-decoration: none; }
-        .navbar-logo .logo { width: 40px; height: 40px; margin-right: 10px; }
+        .navbar-brand-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand-link:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+        .navbar-brand-logo-img {
+            height: 38px;
+            width: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        .navbar-brand-text {
+            font-weight: bold;
+            color: #2F4F4F;
+            font-size: 1.15rem;
+            white-space: nowrap;
+        }
+        .navbar-left-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: white !important;
+            background: linear-gradient(135deg, #1ABC9C 0%, #16A085 100%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .navbar-logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 188, 156, 0.5);
+            filter: brightness(1.1);
+        }
+        #logo-cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e74c3c;
+            color: white !important;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            line-height: 15px;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border: 1.5px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            padding: 0 2px;
+            box-sizing: border-box;
+        }
         .navbar-search-container { flex-grow: 1; display: flex; justify-content: center; }
         .navbar-search { padding: 8px 15px; border: 1px solid #ccc; border-radius: 20px; font-size: 0.9rem; width: 100%; max-width: 400px; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
         .navbar-search:focus { outline: none; border-color: #4682B4; box-shadow: 0 0 0 2px rgba(70, 130, 180, 0.2); }
@@ -65,18 +131,19 @@
         
         .mobile-member-display {
             display: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: bold;
             color: #2F4F4F;
             background-color: rgba(255, 255, 255, 0.6);
-            padding: 6px 12px;
-            border-radius: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
             white-space: nowrap;
             align-items: center;
             gap: 5px;
             border: 1px solid rgba(0, 0, 0, 0.05);
             text-decoration: none;
             transition: all 0.3s ease;
+            height: 38px;
         }
         .mobile-member-display:hover {
             background-color: rgba(255, 255, 255, 0.95);
@@ -98,22 +165,32 @@
                 display: flex !important;
             }
         }
+        @media (max-width: 480px) {
+            .navbar-brand-text { display: none; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="index.html" class="navbar-logo">
-                <img src="image/logo.jpeg" alt="得正 dejeng" class="logo">
-                <span>得正 dejeng</span>
-            </a>
+            <div class="navbar-left-container">
+                <a href="index.html" class="navbar-brand-link">
+                    <img src="image/logo.jpeg" alt="得正 dejeng" class="navbar-brand-logo-img">
+                    <span class="navbar-brand-text">得正 dejeng</span>
+                </a>
+                <a href="cart.html" class="navbar-logo">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="logo-cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
             <div class="navbar-search-container">
                 <input type="search" id="searchInput" class="navbar-search" placeholder="搜尋飲品、甜甜圈、水果...">
             </div>
             <a href="profile.html" id="mobile-member-display" class="mobile-member-display"></a>
             <button class="navbar-toggle" id="navbarToggle">☰</button>
             <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> 首頁</a></li>
                 <li><a href="#drinks"><i class="fa-solid fa-mug-hot"></i> 飲品</a></li>
                 <li><a href="#donuts"><i class="fa-solid fa-cookie"></i> 甜甜圈</a></li>
                 <li><a href="#fruits"><i class="fa-solid fa-apple-whole"></i> 鮮果</a></li>
@@ -293,6 +370,15 @@
                     badge.innerText = totalQty;
                 } else {
                     badge.style.display = 'none';
+                }
+            }
+            let logoBadge = document.getElementById('logo-cart-badge');
+            if(logoBadge) {
+                if(totalQty > 0) {
+                    logoBadge.style.display = 'inline-block';
+                    logoBadge.innerText = totalQty;
+                } else {
+                    logoBadge.style.display = 'none';
                 }
             }
         }

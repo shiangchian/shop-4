@@ -14,13 +14,102 @@
         /* Navbar Styles */
         .navbar { background: #B0E0E6; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000; }
         .navbar-container { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-        .navbar-logo { display: flex; align-items: center; font-size: 1.5rem; font-weight: bold; color: #2F4F4F; text-decoration: none; }
-        .navbar-logo .logo { width: 40px; height: 40px; margin-right: 10px; }
+        .navbar-brand-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .navbar-brand-link:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+        .navbar-brand-logo-img {
+            height: 38px;
+            width: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        .navbar-brand-text {
+            font-weight: bold;
+            color: #2F4F4F;
+            font-size: 1.15rem;
+            white-space: nowrap;
+        }
+        .navbar-left-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: white !important;
+            background: linear-gradient(135deg, #1ABC9C 0%, #16A085 100%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .navbar-logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 188, 156, 0.5);
+            filter: brightness(1.1);
+        }
+        #logo-cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e74c3c;
+            color: white !important;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            line-height: 15px;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border: 1.5px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            padding: 0 2px;
+            box-sizing: border-box;
+        }
         .navbar-menu { display: flex; list-style: none; gap: 20px; align-items: center; margin: 0; padding: 0; }
         .navbar-menu li { position: relative; }
         .navbar-menu a { text-decoration: none; color: #2F4F4F; font-weight: 500; transition: color 0.3s ease; font-size: 0.95rem;}
         .navbar-menu a:hover { color: #4682B4; }
         .navbar-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #2F4F4F; }
+
+        .mobile-member-display {
+            display: none;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #2F4F4F;
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 8px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            height: 38px;
+        }
+        .mobile-member-display:hover {
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            color: #1a73e8;
+        }
 
         /* --- 排行榜專屬樣式 --- */
         .leaderboard-wrapper { flex: 1; padding: 4rem 1rem; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); }
@@ -67,6 +156,9 @@
         @media (max-width: 768px) {
             .navbar-menu { display: none; flex-direction: column; background: #B0E0E6; position: absolute; top: 100%; left: 0; right: 0; width: 100%; padding: 10px 0; }
             .navbar-menu.active { display: flex; } .navbar-toggle { display: block; }
+            .navbar.logged-in .mobile-member-display {
+                display: flex !important;
+            }
             .rank-card { flex-direction: column; text-align: center; padding: 30px 20px; }
             .rank-badge { margin-right: 0; margin-bottom: 15px; }
             .rank-img { margin-right: 0; margin-bottom: 20px; width: 130px; height: 130px; }
@@ -95,18 +187,29 @@
             50% { transform: scale(1.05); box-shadow: 0 4px 14px rgba(255, 65, 108, 0.7); }
             100% { transform: scale(1); box-shadow: 0 4px 8px rgba(255, 65, 108, 0.4); }
         }
+        @media (max-width: 480px) {
+            .navbar-brand-text { display: none; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <div class="navbar-container">
-            <a href="index.html" class="navbar-logo">
-                <img src="image/logo.jpeg" alt="得正 dejeng" class="logo">
-                <span>得正 dejeng</span>
-            </a>
+            <div class="navbar-left-container">
+                <a href="index.html" class="navbar-brand-link">
+                    <img src="image/logo.jpeg" alt="得正 dejeng" class="navbar-brand-logo-img">
+                    <span class="navbar-brand-text">得正 dejeng</span>
+                </a>
+                <a href="cart.html" class="navbar-logo">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="logo-cart-badge" style="display: none;">0</span>
+                </a>
+            </div>
+            <a href="profile.html" id="mobile-member-display" class="mobile-member-display"></a>
             <button class="navbar-toggle" id="navbarToggle">☰</button>
             <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> 首頁</a></li>
                 <li><a href="index.html#drinks"><i class="fa-solid fa-mug-hot"></i> 飲品區</a></li>
                 <li><a href="index.html#donuts"><i class="fa-solid fa-cookie"></i> 甜甜圈</a></li>
                 <li><a href="index.html#fruits"><i class="fa-solid fa-apple-whole"></i> 鮮果區</a></li>
@@ -246,16 +349,28 @@
             const navUser = document.getElementById('nav-user');
             const navLogout = document.getElementById('nav-logout');
             const userDisplay = document.getElementById('user-display');
+            const navbar = document.querySelector('.navbar');
+            const mobileMemberDisplay = document.getElementById('mobile-member-display');
 
             if (user) {
                 navLogin.style.display = 'none';
                 navUser.style.display = 'block';
                 navLogout.style.display = 'block';
-                userDisplay.innerHTML = `<i class="fa-solid fa-user-check me-1"></i> 會員 ${user.displayName || user.email.split('@')[0]}`;
+                const memberName = user.displayName || user.email.split('@')[0];
+                userDisplay.innerHTML = `<i class="fa-solid fa-user-check"></i> 會員 ${memberName}`;
+                if (mobileMemberDisplay) {
+                    mobileMemberDisplay.innerHTML = `<i class="fa-solid fa-user-check" style="color: #1a73e8;"></i> 會員:${memberName}`;
+                }
+                if (navbar) {
+                    navbar.classList.add('logged-in');
+                }
             } else {
                 navLogin.style.display = 'block';
                 navUser.style.display = 'none';
                 navLogout.style.display = 'none';
+                if (navbar) {
+                    navbar.classList.remove('logged-in');
+                }
             }
         });
 
@@ -296,6 +411,15 @@
                     badge.innerText = totalQty;
                 } else {
                     badge.style.display = 'none';
+                }
+            }
+            let logoBadge = document.getElementById('logo-cart-badge');
+            if(logoBadge) {
+                if(totalQty > 0) {
+                    logoBadge.style.display = 'inline-block';
+                    logoBadge.innerText = totalQty;
+                } else {
+                    logoBadge.style.display = 'none';
                 }
             }
         }
