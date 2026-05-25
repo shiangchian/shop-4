@@ -511,6 +511,7 @@
                     <h4 class="mb-4 fw-bold border-bottom pb-3 text-dark">訂單摘要</h4>
                     <div class="summary-row"><span>總數量</span><span id="total-cups" class="fw-bold">0 份</span></div>
                     <div class="summary-row"><span>商品小計</span><span>$<span id="subtotal">0</span></span></div>
+                    <div class="summary-row text-danger" id="discount-row" style="display: none;"><span>特價折抵</span><span>-$<span id="discount-amount">0</span></span></div>
                     <div class="summary-row"><span>外送費</span><span class="text-success fw-bold">免運費</span></div>
                     <div class="total-row"><span>總金額</span><span>$<span id="final-total">0</span></span></div>
                     <button class="btn-checkout" onclick="checkout()">前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i></button>
@@ -706,7 +707,27 @@
                 });
                 
                 container.innerHTML = html;
-                document.getElementById('subtotal').innerText = total.toLocaleString();
+                
+                // Calculate original total and final total difference (discount)
+                let originalTotal = 0;
+                cart.forEach(item => {
+                    const p = productsDB[item.id];
+                    if (p) {
+                        originalTotal += p.price * item.qty;
+                    }
+                });
+                
+                document.getElementById('subtotal').innerText = originalTotal.toLocaleString();
+                
+                const discount = originalTotal - total;
+                const discountRow = document.getElementById('discount-row');
+                if (discount > 0) {
+                    discountRow.style.display = 'flex';
+                    document.getElementById('discount-amount').innerText = discount.toLocaleString();
+                } else {
+                    discountRow.style.display = 'none';
+                }
+                
                 document.getElementById('final-total').innerText = total.toLocaleString();
                 document.getElementById('total-cups').innerText = `${totalCups} 份`;
             } else {
@@ -757,6 +778,8 @@
             const toast = new bootstrap.Toast(toastEl); toast.show(); 
         }
         
+        let currentCheckoutOriginalTotal = 0;
+        let currentCheckoutDiscount = 0;
         let currentCheckoutTotal = 0;
 
         // --- 結帳時，將商品清單存入訂單記錄 ---
@@ -767,24 +790,45 @@
             }
 
             // 1. 計算金額
-            let total = 0;
+            let originalTotal = 0;
+            let finalTotal = 0;
             const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
             cart.forEach(item => {
                 const p = productsDB[item.id];
                 if(p) {
                     const promoPrice = statusSettings[p.name]?.promoPrice;
                     const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
-                    total += (currentPrice * item.qty);
+                    originalTotal += p.price * item.qty;
+                    finalTotal += currentPrice * item.qty;
                 }
             });
-            currentCheckoutTotal = total;
+            currentCheckoutOriginalTotal = originalTotal;
+            currentCheckoutTotal = finalTotal;
+            currentCheckoutDiscount = originalTotal - finalTotal;
 
             // 2. 更新彈窗中的金額顯示
-            document.getElementById('payment-modal-total').innerText = total.toLocaleString();
-            document.getElementById('payment-card-total').innerText = total.toLocaleString();
-            document.getElementById('payment-apple-pay-total').innerText = total.toLocaleString();
+            document.getElementById('payment-modal-total').innerText = finalTotal.toLocaleString();
+            document.getElementById('payment-card-total').innerText = finalTotal.toLocaleString();
+            document.getElementById('payment-apple-pay-total').innerText = finalTotal.toLocaleString();
 
-            // 3. 顯示彈窗
+            // 3. 顯示折扣提示
+            const promoHint = document.getElementById('payment-modal-promo-hint');
+            if (currentCheckoutDiscount > 0) {
+                promoHint.style.display = 'block';
+                document.getElementById('payment-modal-discount').innerText = currentCheckoutDiscount.toLocaleString();
+                
+                // Apple Pay sheet rows
+                document.getElementById('ios-row-subtotal').style.display = 'flex';
+                document.getElementById('ios-row-discount').style.display = 'flex';
+                document.getElementById('payment-apple-pay-subtotal').innerText = originalTotal.toLocaleString();
+                document.getElementById('payment-apple-pay-discount').innerText = currentCheckoutDiscount.toLocaleString();
+            } else {
+                promoHint.style.display = 'none';
+                document.getElementById('ios-row-subtotal').style.display = 'none';
+                document.getElementById('ios-row-discount').style.display = 'none';
+            }
+
+            // 4. 顯示彈窗
             showPaymentModal();
         }
 
@@ -959,6 +1003,8 @@
             // Write order
             const newOrder = {
                 total: currentCheckoutTotal,
+                originalTotal: currentCheckoutOriginalTotal,
+                discount: currentCheckoutDiscount,
                 items: purchasedItems,
                 itemsCount: cart.length,
                 customer: customerName,
@@ -991,6 +1037,7 @@
             <div id="payment-screen-select" class="payment-screen">
                 <h3 class="payment-modal-title">請選擇付款方式</h3>
                 <p class="payment-modal-subtitle">總計金額：$<span id="payment-modal-total">0</span></p>
+                <div id="payment-modal-promo-hint" class="text-success text-center mb-3 fw-bold" style="display:none; font-size: 0.95rem;">🎉 已享特價折抵 -$<span id="payment-modal-discount">0</span></div>
                 
                 <div class="payment-options">
                     <!-- Option 1: Apple Pay -->
@@ -1077,6 +1124,16 @@
                        <div class="ios-value">台灣台北市大安區忠孝東路四段123號</div>
                     </div>
                     
+                    <div class="ios-row" id="ios-row-subtotal" style="display: none;">
+                       <div class="ios-label">商品小計</div>
+                       <div class="ios-value">$<span id="payment-apple-pay-subtotal">0</span></div>
+                    </div>
+                    
+                    <div class="ios-row" id="ios-row-discount" style="display: none; color: #ff3b30;">
+                       <div class="ios-label" style="color: #ff3b30;">特價折抵</div>
+                       <div class="ios-value" style="color: #ff3b30;">-$<span id="payment-apple-pay-discount">0</span></div>
+                    </div>
+
                     <div class="ios-row">
                        <div class="ios-label">總計</div>
                        <div class="ios-value fw-bold" style="color: #000; font-size: 1.25rem;">$<span id="payment-apple-pay-total">0</span></div>
