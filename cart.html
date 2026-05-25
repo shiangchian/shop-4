@@ -111,6 +111,374 @@
             border: 1px solid rgba(255,255,255,0.2);
             color: white !important;
         }
+
+        /* Continue Shopping Button */
+        .btn-continue-shopping {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 2px solid #1ABC9C;
+            color: #1ABC9C;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 50px;
+            width: 100%;
+            margin-top: 12px;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 1.05rem;
+        }
+        .btn-continue-shopping:hover {
+            background: rgba(26, 188, 156, 0.05);
+            color: #16A085;
+            border-color: #16A085;
+            transform: scale(1.02);
+            text-decoration: none;
+        }
+
+        /* Payment Modal Overlay */
+        .payment-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .payment-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .payment-modal-container {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .payment-modal-overlay.active .payment-modal-container {
+            transform: scale(1);
+        }
+        .payment-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #888;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .payment-modal-close:hover {
+            color: #333;
+        }
+        .payment-modal-title {
+            font-weight: 700;
+            color: #2F4F4F;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+        }
+        .payment-modal-subtitle {
+            text-align: center;
+            color: #777;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+        
+        /* Payment Selection Buttons */
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .payment-opt-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border-radius: 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .payment-opt-btn:hover {
+            border-color: #1ABC9C;
+            background: rgba(26, 188, 156, 0.02);
+            transform: translateY(-2px);
+        }
+        .btn-apple-pay-direct {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        .btn-apple-pay-direct:hover {
+            background: #222;
+            border-color: #222;
+            color: white;
+        }
+        
+        /* Glassmorphic Credit Card Preview */
+        .interactive-card-wrapper {
+            perspective: 1000px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+        }
+        .glass-credit-card {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+            background-color: #2c3e50; /* Base premium color */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-credit-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .card-chip {
+            width: 40px;
+            height: 26px;
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+            border-radius: 6px;
+        }
+        .card-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        .card-number {
+            font-size: 1.35rem;
+            font-family: monospace;
+            letter-spacing: 3px;
+            margin: 15px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .card-info-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .card-holder-col, .card-expiry-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .card-label {
+            font-size: 0.65rem;
+            color: #bdc3c7;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .card-val {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        /* Forms styling */
+        .btn-checkout-confirm {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 14px;
+            border-radius: 50px;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.4);
+            font-size: 1.1rem;
+        }
+        .btn-checkout-confirm:hover {
+            transform: scale(1.02);
+            background: linear-gradient(90deg, #1ABC9C 0%, #16A085 100%);
+        }
+        .payment-back-btn {
+            background: none;
+            border: none;
+            color: #555;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .payment-back-btn:hover {
+            color: #1ABC9C;
+        }
+        .back-btn-container {
+            margin-bottom: 15px;
+        }
+        
+        /* Apple Pay iOS Sheet Simulation */
+        .ios-apple-pay-sheet {
+            background: #f2f2f7;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid #e5e5ea;
+        }
+        .ios-header {
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #e5e5ea;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .ios-apple-pay-logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: black;
+        }
+        .ios-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e5ea;
+        }
+        .ios-label {
+            font-size: 0.9rem;
+            color: #8e8e93;
+            font-weight: 500;
+        }
+        .ios-value {
+            font-size: 0.95rem;
+            color: #000;
+            font-weight: 600;
+            text-align: right;
+            max-width: 70%;
+        }
+        .ios-auth-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .faceid-icon-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .faceid-svg {
+            transition: transform 0.3s;
+        }
+        .faceid-icon-wrapper:hover .faceid-svg {
+            transform: scale(1.05);
+        }
+        .faceid-spinner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(0, 122, 255, 0.1);
+            border-top: 4px solid #007aff;
+            border-radius: 50%;
+            animation: ios-spin 1s linear infinite;
+        }
+        .faceid-success-checkmark {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        @keyframes ios-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .ios-auth-hint {
+            font-size: 0.85rem;
+            color: #8e8e93;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        /* Processing Loading and Checkmarks */
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(26, 188, 156, 0.1);
+            border-top: 5px solid #1ABC9C;
+            border-radius: 50%;
+            animation: ios-spin 0.8s linear infinite;
+        }
+        
+        .checkmark-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .checkmark-circle {
+            width: 80px;
+            height: 80px;
+            background: #2ED573;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(46, 213, 115, 0.3);
+            animation: checkmark-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes checkmark-pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: checkmark-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
     </style>
 </head>
 <body>
@@ -146,6 +514,7 @@
                     <div class="summary-row"><span>外送費</span><span class="text-success fw-bold">免運費</span></div>
                     <div class="total-row"><span>總金額</span><span>$<span id="final-total">0</span></span></div>
                     <button class="btn-checkout" onclick="checkout()">前往結帳 <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                    <a href="index.html" class="btn-continue-shopping"><i class="fa-solid fa-cart-plus me-2"></i>繼續購物</a>
                 </div>
             </div>
         </div>
@@ -388,6 +757,8 @@
             const toast = new bootstrap.Toast(toastEl); toast.show(); 
         }
         
+        let currentCheckoutTotal = 0;
+
         // --- 結帳時，將商品清單存入訂單記錄 ---
         window.checkout = function() { 
             if(cart.length === 0) {
@@ -395,60 +766,362 @@
                 return;
             }
 
-            const btn = document.querySelector('.btn-checkout'); 
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> 訂單處理中...'; 
-            btn.disabled = true; 
+            // 1. 計算金額
+            let total = 0;
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            cart.forEach(item => {
+                const p = productsDB[item.id];
+                if(p) {
+                    const promoPrice = statusSettings[p.name]?.promoPrice;
+                    const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
+                    total += (currentPrice * item.qty);
+                }
+            });
+            currentCheckoutTotal = total;
+
+            // 2. 更新彈窗中的金額顯示
+            document.getElementById('payment-modal-total').innerText = total.toLocaleString();
+            document.getElementById('payment-card-total').innerText = total.toLocaleString();
+            document.getElementById('payment-apple-pay-total').innerText = total.toLocaleString();
+
+            // 3. 顯示彈窗
+            showPaymentModal();
+        }
+
+        window.showPaymentModal = function() {
+            const overlay = document.getElementById('payment-modal');
+            overlay.style.display = 'flex';
+            // Force reflow
+            overlay.offsetHeight;
+            overlay.classList.add('active');
             
-            setTimeout(() => { 
-                let total = 0;
-                let purchasedItems = []; // 準備用來裝商品明細
-                const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            // Show initial screen, hide others
+            showScreen('payment-screen-select');
+            
+            // Reset inputs
+            document.getElementById('credit-card-form').reset();
+            updateCardNumber({ value: '' });
+            updateCardExpiry({ value: '' });
+            updateCardHolder({ value: '' });
+            
+            // Reset FaceID/Apple Pay
+            document.getElementById('faceid-spinner').style.display = 'none';
+            document.getElementById('faceid-checkmark').style.display = 'none';
+            document.getElementById('ios-auth-hint').innerText = "使用 Face ID 付款 (點選圖示模擬驗證)";
+        }
 
-                // 1. 計算金額並打包商品名稱
-                cart.forEach(item => {
-                    const p = productsDB[item.id];
-                    if(p) {
-                        const promoPrice = statusSettings[p.name]?.promoPrice;
-                        const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
-                        total += (currentPrice * item.qty);
-                        // 如果有甜度冰塊，把它加在名字後面
-                        let spec = (item.sugar !== '--' && item.ice !== '--') ? ` (${item.sugar}/${item.ice})` : '';
-                        purchasedItems.push(`${p.name}${spec} x${item.qty}`);
-                    }
-                });
+        window.closePaymentModal = function() {
+            const overlay = document.getElementById('payment-modal');
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        }
 
-                // 2. 取得顧客名稱
-                let customerName = "訪客 (前台購買)";
-                const nameSpan = document.getElementById('current-user-name');
-                if (nameSpan) { customerName = nameSpan.innerText; }
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.payment-screen');
+            screens.forEach(s => s.style.display = 'none');
+            document.getElementById(screenId).style.display = 'block';
+        }
 
-                // 3. 建立訂單，並把 items(明細) 寫進去
-                const newOrder = {
-                    total: total,
-                    items: purchasedItems, // ★ 關鍵：把明細存進去
-                    itemsCount: cart.length,
-                    customer: customerName,
-                    timestamp: new Date().getTime()
-                };
+        window.selectPaymentMethod = function(method) {
+            if (method === 'apple-pay') {
+                showScreen('payment-screen-apple-pay');
+            } else if (method === 'credit-card') {
+                showScreen('payment-screen-card');
+            }
+        }
+
+        window.backToSelect = function() {
+            showScreen('payment-screen-select');
+        }
+
+        // Credit Card Input Real-time Preview & Formatting
+        window.updateCardNumber = function(input) {
+            // Remove non-digits and format as 4-digit chunks
+            let val = input.value.replace(/\D/g, '');
+            let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+            input.value = formatted;
+            
+            const preview = document.getElementById('preview-card-number');
+            preview.innerText = formatted || '•••• •••• •••• ••••';
+            
+            // Detect card brand
+            const logo = document.getElementById('preview-card-logo');
+            if (val.startsWith('4')) {
+                logo.innerText = 'VISA';
+            } else if (val.startsWith('5')) {
+                logo.innerText = 'Mastercard';
+            } else if (val.startsWith('3')) {
+                logo.innerText = 'AMEX';
+            } else {
+                logo.innerText = 'VISA';
+            }
+        }
+
+        window.updateCardExpiry = function(input) {
+            // Remove non-digits and insert slash
+            let val = input.value.replace(/\D/g, '');
+            if (val.length >= 2) {
+                val = val.substring(0, 2) + '/' + val.substring(2);
+            }
+            input.value = val;
+            
+            const preview = document.getElementById('preview-card-expiry');
+            preview.innerText = val || 'MM/YY';
+        }
+
+        window.updateCardHolder = function(input) {
+            const preview = document.getElementById('preview-card-holder');
+            preview.innerText = input.value.toUpperCase() || 'YOUR NAME';
+        }
+
+        window.processCardPayment = function(event) {
+            event.preventDefault();
+            
+            // Show processing screen
+            showScreen('payment-screen-processing');
+            
+            setTimeout(() => {
+                showScreen('payment-screen-success');
+                setTimeout(() => {
+                    finalizePayment('Credit Card');
+                }, 1500);
+            }, 2000);
+        }
+
+        // Apple Pay Face ID simulated authorization
+        window.triggerApplePayAuth = function() {
+            const spinner = document.getElementById('faceid-spinner');
+            const checkmark = document.getElementById('faceid-checkmark');
+            const hint = document.getElementById('ios-auth-hint');
+            
+            hint.innerText = "驗證中...";
+            spinner.style.display = 'block';
+            
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                checkmark.style.display = 'flex';
+                hint.innerText = "付款成功！";
                 
-                let orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
-                orders.push(newOrder);
-                localStorage.setItem('dejeng_orders', JSON.stringify(orders));
-
-                // 4. 結帳完成，清空畫面
-                window.showToast("感謝您的購買，訂單已成立！"); 
-                btn.innerHTML = '<i class="fa-solid fa-check me-2"></i> 結帳完成'; 
-                localStorage.removeItem('dejeng_cart'); 
-                cart = [];
+                // Play simulated click/chime success effect
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                    
+                    setTimeout(() => {
+                        const osc2 = ctx.createOscillator();
+                        const gain2 = ctx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(ctx.destination);
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(1000, ctx.currentTime);
+                        gain2.gain.setValueAtTime(0.1, ctx.currentTime);
+                        osc2.start();
+                        osc2.stop(ctx.currentTime + 0.25);
+                    }, 150);
+                } catch (e) {
+                    console.log("Audio simulation failed:", e);
+                }
                 
-                setTimeout(() => { 
-                    window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName);
-                }, 1000); 
-            }, 1500); 
+                setTimeout(() => {
+                    finalizePayment('Apple Pay');
+                }, 1500);
+            }, 1800);
+        }
+
+        function finalizePayment(method) {
+            let purchasedItems = [];
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+
+            // Pack items
+            cart.forEach(item => {
+                const p = productsDB[item.id];
+                if(p) {
+                    let spec = (item.sugar !== '--' && item.ice !== '--') ? ` (${item.sugar}/${item.ice})` : '';
+                    purchasedItems.push(`${p.name}${spec} x${item.qty}`);
+                }
+            });
+
+            // Get customer name
+            let customerName = "訪客 (前台購買)";
+            const nameSpan = document.getElementById('current-user-name');
+            if (nameSpan) { customerName = nameSpan.innerText; }
+
+            // Write order
+            const newOrder = {
+                total: currentCheckoutTotal,
+                items: purchasedItems,
+                itemsCount: cart.length,
+                customer: customerName,
+                paymentMethod: method, // Record payment method
+                timestamp: new Date().getTime()
+            };
+            
+            let orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            orders.push(newOrder);
+            localStorage.setItem('dejeng_orders', JSON.stringify(orders));
+
+            // Clear Cart
+            localStorage.removeItem('dejeng_cart'); 
+            cart = [];
+            
+            closePaymentModal();
+            window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName);
         }
 
         renderCart();
     </script>
+
+    <!-- Fake Payment Modal -->
+    <div id="payment-modal" class="payment-modal-overlay" style="display: none;">
+        <div class="payment-modal-container">
+            <!-- Close Button -->
+            <button class="payment-modal-close" onclick="closePaymentModal()">&times;</button>
+            
+            <!-- Screen 1: Select Payment Method -->
+            <div id="payment-screen-select" class="payment-screen">
+                <h3 class="payment-modal-title">請選擇付款方式</h3>
+                <p class="payment-modal-subtitle">總計金額：$<span id="payment-modal-total">0</span></p>
+                
+                <div class="payment-options">
+                    <!-- Option 1: Apple Pay -->
+                    <button class="payment-opt-btn btn-apple-pay-direct" onclick="selectPaymentMethod('apple-pay')">
+                        <i class="fa-brands fa-apple me-2 fs-4"></i> Apple Pay
+                    </button>
+                    
+                    <!-- Option 2: Apple Pay 信用卡 -->
+                    <button class="payment-opt-btn btn-credit-card" onclick="selectPaymentMethod('credit-card')">
+                        <i class="fa-solid fa-credit-card me-2 fs-5"></i> Apple Pay 信用卡
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Screen 2A: Credit Card Form -->
+            <div id="payment-screen-card" class="payment-screen" style="display: none;">
+                <div class="back-btn-container">
+                    <button class="payment-back-btn" onclick="backToSelect()"><i class="fa-solid fa-arrow-left"></i> 返回</button>
+                </div>
+                <h3 class="payment-modal-title">輸入信用卡資訊</h3>
+                
+                <!-- Interactive Glassmorphic Card Preview -->
+                <div class="interactive-card-wrapper">
+                    <div class="glass-credit-card" id="credit-card-preview">
+                        <div class="card-chip"></div>
+                        <div class="card-logo" id="preview-card-logo">VISA</div>
+                        <div class="card-number" id="preview-card-number">•••• •••• •••• ••••</div>
+                        <div class="card-info-row">
+                            <div class="card-holder-col">
+                                <div class="card-label">CARDHOLDER</div>
+                                <div class="card-val" id="preview-card-holder">YOUR NAME</div>
+                            </div>
+                            <div class="card-expiry-col">
+                                <div class="card-label">EXPIRES</div>
+                                <div class="card-val" id="preview-card-expiry">MM/YY</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Form -->
+                <form id="credit-card-form" onsubmit="processCardPayment(event)">
+                    <div class="form-group mb-3">
+                        <label class="form-label">卡號</label>
+                        <input type="text" id="card-number-input" class="form-control" placeholder="4242 4242 4242 4242" maxlength="19" required oninput="updateCardNumber(this)">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">到期日</label>
+                            <input type="text" id="card-expiry-input" class="form-control" placeholder="MM/YY" maxlength="5" required oninput="updateCardExpiry(this)">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">安全碼 (CVV)</label>
+                            <input type="text" id="card-cvv-input" class="form-control" placeholder="123" maxlength="3" required>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="form-label">持卡人姓名</label>
+                        <input type="text" id="card-name-input" class="form-control" placeholder="輸入姓名" required oninput="updateCardHolder(this)">
+                    </div>
+                    <button type="submit" class="btn-checkout-confirm">確認付款 $<span id="payment-card-total">0</span></button>
+                </form>
+            </div>
+            
+            <!-- Screen 2B: Apple Pay iOS Simulated Sheet -->
+            <div id="payment-screen-apple-pay" class="payment-screen" style="display: none;">
+                <div class="back-btn-container">
+                    <button class="payment-back-btn" onclick="backToSelect()"><i class="fa-solid fa-arrow-left"></i> 返回</button>
+                </div>
+                
+                <!-- iOS Apple Pay Sheet Mockup -->
+                <div class="ios-apple-pay-sheet">
+                    <div class="ios-header">
+                        <div class="ios-apple-pay-logo"><i class="fa-brands fa-apple"></i> Pay</div>
+                    </div>
+                    
+                    <div class="ios-row">
+                       <div class="ios-label">卡片</div>
+                       <div class="ios-value"><i class="fa-solid fa-credit-card text-primary me-2"></i>得正聯名卡 (•••• 8888)</div>
+                    </div>
+                    
+                    <div class="ios-row">
+                       <div class="ios-label">送貨地址</div>
+                       <div class="ios-value">台灣台北市大安區忠孝東路四段123號</div>
+                    </div>
+                    
+                    <div class="ios-row">
+                       <div class="ios-label">總計</div>
+                       <div class="ios-value fw-bold" style="color: #000; font-size: 1.25rem;">$<span id="payment-apple-pay-total">0</span></div>
+                    </div>
+                    
+                    <!-- Face ID/Touch ID Scanning Animation -->
+                    <div class="ios-auth-container" onclick="triggerApplePayAuth()">
+                        <div class="faceid-icon-wrapper" id="faceid-trigger">
+                            <svg class="faceid-svg" viewBox="0 0 100 100" width="80" height="80">
+                                <path class="faceid-path" d="M25,35 L25,25 L35,25 M75,35 L75,25 L65,25 M25,65 L25,75 L35,75 M75,65 L75,75 L65,75" fill="none" stroke="#007AFF" stroke-width="4" stroke-linecap="round"/>
+                                <path class="faceid-eyes" d="M40,45 A 3,3 0 1,1 40,44.9 M60,45 A 3,3 0 1,1 60,44.9" fill="none" stroke="#007AFF" stroke-width="4" stroke-linecap="round"/>
+                                <path class="faceid-nose" d="M50,45 L50,55 L45,55" fill="none" stroke="#007AFF" stroke-width="4" stroke-linecap="round"/>
+                                <path class="faceid-mouth" d="M40,65 Q50,70 60,65" fill="none" stroke="#007AFF" stroke-width="4" stroke-linecap="round"/>
+                            </svg>
+                            <div class="faceid-spinner" id="faceid-spinner" style="display: none;"></div>
+                            <div class="faceid-success-checkmark" id="faceid-checkmark" style="display: none;">
+                                <i class="fa-solid fa-circle-check text-success fs-1 animate-pop"></i>
+                            </div>
+                        </div>
+                        <p class="ios-auth-hint" id="ios-auth-hint">使用 Face ID 付款 (點選圖示模擬驗證)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Screen 3: Processing/Loading & Success Checkmark Animation -->
+            <div id="payment-screen-processing" class="payment-screen" style="display: none; padding: 40px 0;">
+                <div class="spinner-container">
+                    <div class="loading-spinner"></div>
+                </div>
+                <h4 class="mt-4 fw-bold text-center" style="color: #2F4F4F;">安全付款授權中...</h4>
+                <p class="text-muted text-center">請勿關閉視窗</p>
+            </div>
+            
+            <div id="payment-screen-success" class="payment-screen" style="display: none; padding: 40px 0;">
+                <div class="checkmark-animation">
+                    <div class="checkmark-circle">
+                        <i class="fa-solid fa-check text-white fs-1"></i>
+                    </div>
+                </div>
+                <h4 class="mt-4 fw-bold text-center" style="color: #2ED573;">付款成功！</h4>
+                <p class="text-muted text-center">您的訂單已成立，正為您導向至評分系統...</p>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
