@@ -502,7 +502,10 @@
     </nav>
 
     <div class="main-content container py-5">
-        <h2 class="mb-4 fw-bold text-dark"><i class="fa-solid fa-cart-shopping text-info me-2"></i>我的購物車</h2>
+        <h2 class="mb-4 fw-bold text-dark">
+            <i class="fa-solid fa-cart-shopping text-info me-2"></i>我的購物車
+            <span id="unpaid-badge" class="badge bg-warning text-dark ms-2" style="font-size: 1.05rem; border-radius: 10px; display: none;">0項未結</span>
+        </h2>
         
         <div class="row" id="cart-content">
             <div class="col-lg-8" id="cart-items-container"></div>
@@ -641,6 +644,16 @@
             const emptyState = document.getElementById('empty-state');
             const cartContent = document.getElementById('cart-content');
             const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+
+            const unpaidBadge = document.getElementById('unpaid-badge');
+            if (unpaidBadge) {
+                if (cart.length > 0) {
+                    unpaidBadge.innerText = `${cart.length}項未結`;
+                    unpaidBadge.style.display = 'inline-block';
+                } else {
+                    unpaidBadge.style.display = 'none';
+                }
+            }
 
             if (cart.length > 0) {
                 emptyState.style.display = 'none';
@@ -788,31 +801,10 @@
                 alert("購物車是空的喔！");
                 return;
             }
+            window.location.href = "checkout.html";
+        }
 
-            // 1. 計算金額
-            let originalTotal = 0;
-            let finalTotal = 0;
-            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
-            cart.forEach(item => {
-                const p = productsDB[item.id];
-                if(p) {
-                    const promoPrice = statusSettings[p.name]?.promoPrice;
-                    const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
-                    originalTotal += p.price * item.qty;
-                    finalTotal += currentPrice * item.qty;
-                }
-            });
-            currentCheckoutOriginalTotal = originalTotal;
-            currentCheckoutTotal = finalTotal;
-            currentCheckoutDiscount = originalTotal - finalTotal;
-
-            // 2. 更新彈窗中的金額顯示
-            document.getElementById('payment-modal-total').innerText = finalTotal.toLocaleString();
-            document.getElementById('payment-card-total').innerText = finalTotal.toLocaleString();
-            document.getElementById('payment-apple-pay-total').innerText = finalTotal.toLocaleString();
-
-            // 3. 顯示折扣提示
-            const promoHint = document.getElementById('payment-modal-promo-hint');
+        const old_unused_checkout = function() {
             if (currentCheckoutDiscount > 0) {
                 promoHint.style.display = 'block';
                 document.getElementById('payment-modal-discount').innerText = currentCheckoutDiscount.toLocaleString();
