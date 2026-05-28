@@ -220,6 +220,35 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
             border-left-color: #2F4F4F !important;
         }
+
+        /* 訂單明細橫幅與圖片 */
+        .section-banner {
+            background: linear-gradient(135deg, #48C9B0 0%, #16A085 100%);
+            color: white;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-align: center;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .section-banner.details {
+            background: linear-gradient(135deg, #F39C12 0%, #E74C3C 100%);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+        }
+        .details-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -267,13 +296,56 @@
             <!-- 右側/下方：歷史購買紀錄 -->
             <div class="col-lg-7">
                 <div class="profile-container w-100" style="max-height: 80vh; overflow-y: auto;">
-                    <h3 style="color: #2F4F4F; font-weight: 800; margin-bottom: 25px;">
-                        <i class="fa-solid fa-clock-rotate-left text-info me-2"></i>歷史購買紀錄
-                    </h3>
-                    <div id="order-history-list">
-                        <div class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-spinner fa-spin fa-2x mb-3"></i>
-                            <p>載入訂單紀錄中...</p>
+                    <!-- 歷史購買紀錄檢視 -->
+                    <div id="order-history-view">
+                        <h3 style="color: #2F4F4F; font-weight: 800; margin-bottom: 25px;">
+                            <i class="fa-solid fa-clock-rotate-left text-info me-2"></i>歷史購買紀錄
+                        </h3>
+                        <div id="order-history-list">
+                            <div class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-spinner fa-spin fa-2x mb-3"></i>
+                                <p>載入訂單紀錄中...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 訂單明細檢視 -->
+                    <div id="order-detail-view" style="display: none;">
+                        <div class="section-banner details mb-4">
+                            <i class="fa-solid fa-file-invoice fs-4"></i> 訂單明細
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-info-circle text-info me-1"></i>訂單資訊</h5>
+                                <div class="mb-2"><strong>訂單流水號：</strong><span id="detail-order-id" class="badge bg-secondary text-white" style="font-size:0.95rem;">ORD...</span></div>
+                                <div><strong>建立時間：</strong><span id="detail-order-time" class="text-muted">2026-05-28 12:00:00</span></div>
+                            </div>
+                            <div class="col-md-6 mb-3 text-md-end">
+                                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-credit-card text-success me-1"></i>付款與狀態</h5>
+                                <div class="mb-2"><strong>付款金額：</strong><span id="detail-payment-total" class="fw-bold text-danger fs-5">NT$ 0</span></div>
+                                <div class="mb-2"><strong>付款方式：</strong><span id="detail-payment-method" class="badge bg-info text-dark">信用卡付款</span></div>
+                                <div><strong>訂單狀態：</strong><span id="detail-order-status" class="badge bg-warning">待出貨</span></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered align-middle text-center" style="border-color: #e2e8f0;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>商品名稱</th>
+                                        <th style="width: 100px;">圖片</th>
+                                        <th style="width: 100px;">單價</th>
+                                        <th style="width: 80px;">數量</th>
+                                        <th style="width: 120px;">小計</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-items-body">
+                                    <!-- 動態生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex gap-3 justify-content-center mt-4">
+                            <a href="index.html" class="btn text-white rounded-pill px-4 py-2" style="background-color: #1ABC9C; font-weight: bold;"><i class="fa-solid fa-house me-1"></i> 返回首頁</a>
+                            <button class="btn text-dark rounded-pill px-4 py-2" style="background-color: #F1C40F; font-weight: bold;" onclick="hideOrderDetail()"><i class="fa-solid fa-arrow-left me-1"></i> 返回訂單列表</button>
                         </div>
                     </div>
                 </div>
@@ -357,13 +429,21 @@
                 }).join('');
 
                 const orderNum = userOrders.length - index;
+                const ordDate = new Date(order.timestamp);
+                const ordDateStr = ordDate.getFullYear() + 
+                                   String(ordDate.getMonth() + 1).padStart(2, '0') + 
+                                   String(ordDate.getDate()).padStart(2, '0') +
+                                   String(ordDate.getHours()).padStart(2, '0') +
+                                   String(ordDate.getMinutes()).padStart(2, '0') +
+                                   String(ordDate.getSeconds()).padStart(2, '0');
+                const serialNo = order.orderId || `ORD${ordDateStr}`;
                 html += `
                     <div class="card border-0 shadow-sm mb-3 order-card" style="border-radius: 15px; overflow: hidden; background: #fafbfc; animation-delay: ${index * 0.08}s;">
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <span class="text-muted small d-block mb-1"><i class="fa-regular fa-clock me-1"></i>${dateStr}</span>
-                                    <span class="badge rounded-pill" style="font-size: 0.8rem; background-color: #E8F8F5; color: #117A65; padding: 4px 10px;">訂單 #${orderNum}</span>
+                                    <span class="badge rounded-pill" style="font-size: 0.8rem; background-color: #E8F8F5; color: #117A65; padding: 4px 10px;">訂單流水號：${serialNo}</span>
                                 </div>
                                 <div class="text-end">
                                     <span class="text-muted small d-block">消費金額</span>
@@ -373,6 +453,11 @@
                             <ul class="list-group list-group-flush mb-0 pt-2 border-top border-light-subtle">
                                 ${itemsHtml}
                             </ul>
+                            <div class="text-end mt-3 pt-2 border-top border-light-subtle">
+                                <button class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="showOrderDetail('${serialNo}')">
+                                    <i class="fa-solid fa-file-invoice me-1"></i>查看訂單明細
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -380,6 +465,209 @@
 
             historyList.innerHTML = html;
         }
+
+        const productsDB = {
+            "tea01": { name: "水之森玄米抹茶", price: 65, img: "image/01.jpg" },
+            "tea02": { name: "英倫伯爵紅茶", price: 55, img: "image/02.jpg" },
+            "tea03": { name: "珍珠鮮奶", price: 75, img: "image/03.jpg" },
+            "tea04": { name: "手炒黑糖鮮奶", price: 80, img: "image/04.jpg" },
+            "tea05": { name: "嫩仙草凍奶", price: 70, img: "image/05.jpg" },
+            "tea06": { name: "海鹽芒果綠", price: 65, img: "image/06.jpg" },
+            "tea07": { name: "琥珀高峰烏龍", price: 55, img: "image/07.jpg" },
+            "tea08": { name: "茉香綠茶拿鐵", price: 65, img: "image/08.jpg" },
+            "tea09": { name: "芋頭鮮奶", price: 85, img: "image/09.jpg" },
+            "tea10": { name: "果漾微甜氣泡飲", price: 75, img: "image/10.jpg" },
+            "tea11": { name: "經典冰水果茶", price: 80, img: "image/11.jpg" },
+            "tea12": { name: "季節限定特調", price: 85, img: "image/12.jpg" },
+            "tea13": { name: "招牌綜合果茶", price: 90, img: "image/13.jpg" },
+            "tea27": { name: "焙烏龍鮮奶", price: 70, img: "image/27.jpg" },
+            "tea28": { name: "柚見冰茶", price: 65, img: "image/28.jpg" },
+            "tea31": { name: "蜜桃春烏龍", price: 75, img: "image/31.jpg" },
+            "tea32": { name: "芝士奶蓋紅茶", price: 70, img: "image/32.jpg" },
+            "tea33": { name: "桂花烏龍凍飲", price: 65, img: "image/33.jpg" },
+            "donut01": { name: "蜜糖波堤", price: 45, img: "image/0001.jpg" },
+            "donut02": { name: "雙層巧克力波堤", price: 50, img: "image/0002.jpg" },
+            "donut03": { name: "草莓波堤", price: 50, img: "image/0003.jpg" },
+            "donut04": { name: "經典糖霜甜甜圈", price: 45, img: "image/0004.jpg" },
+            "donut05": { name: "巧克力脆片波堤", price: 55, img: "image/0005.jpg" },
+            "donut06": { name: "草莓夾心甜甜圈", price: 55, img: "image/0006.jpg" },
+            "donut07": { name: "抹茶巧貝", price: 55, img: "image/0007.jpg" },
+            "fruit01": { name: "鮮甜愛文芒果", price: 100, img: "image/S1.jpg" },
+            "fruit02": { name: "清香麻豆文旦", price: 80, img: "image/S2.jpg" },
+            "fruit03": { name: "活力陽光香蕉", price: 50, img: "image/S3.jpg" },
+            "fruit04": { name: "嚴選進口紅櫻桃", price: 150, img: "image/S4.jpg" },
+            "fruit05": { name: "清脆鮮切小黃瓜", price: 40, img: "image/S5.jpg" },
+            "fruit06": { name: "紐西蘭奇異果", price: 85, img: "image/S6.jpg" },
+            "fruit07": { name: "鮮甜多汁水蜜桃", price: 120, img: "image/unnamed.jpg" },
+            "fruit08": { name: "屏東金鑽鳳梨", price: 70, img: "image/unnamed (1).jpg" },
+            "fruit09": { name: "屏東黑珍珠蓮霧", price: 90, img: "image/unnamed (2).jpg" },
+            "fruit10": { name: "沁涼紅肉西瓜盤", price: 65, img: "image/unnamed (3).jpg" },
+            "fruit11": { name: "屏東無籽綠檸檬", price: 55, img: "image/unnamed (4).jpg" },
+            "fruit12": { name: "清脆甜水梨", price: 85, img: "image/unnamed (5).jpg" }
+        };
+
+        function parseOrderItem(itemStr) {
+            let name = '';
+            let code = '';
+            let specs = '';
+            let qty = 1;
+
+            const lastX = itemStr.lastIndexOf(' x');
+            let baseStr = itemStr;
+            if (lastX !== -1) {
+                baseStr = itemStr.substring(0, lastX).trim();
+                qty = parseInt(itemStr.substring(lastX + 2).trim(), 10) || 1;
+            }
+
+            const parenMatch = baseStr.match(/\(([^)]+)\)/);
+            if (parenMatch) {
+                name = baseStr.replace(/\s*\([^)]+\)/g, '').trim();
+                const inner = parenMatch[1];
+                const parts = inner.split('/');
+                code = parts[0];
+                if (parts.length > 1) {
+                    specs = parts.slice(1).join(' / ');
+                }
+            } else {
+                name = baseStr;
+            }
+
+            return { name, code, specs, qty };
+        }
+
+        function findProductDetails(name) {
+            for (const key in productsDB) {
+                if (productsDB[key].name === name) {
+                    return productsDB[key];
+                }
+            }
+            return null;
+        }
+
+        window.showOrderDetail = function(orderId) {
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            const order = orders.find(o => {
+                if (o.orderId === orderId) return true;
+                const ordDate = new Date(o.timestamp);
+                const ordDateStr = ordDate.getFullYear() + 
+                                   String(ordDate.getMonth() + 1).padStart(2, '0') + 
+                                   String(ordDate.getDate()).padStart(2, '0') +
+                                   String(ordDate.getHours()).padStart(2, '0') +
+                                   String(ordDate.getMinutes()).padStart(2, '0') +
+                                   String(ordDate.getSeconds()).padStart(2, '0');
+                const fallbackId = `ORD${ordDateStr}`;
+                return fallbackId === orderId;
+            });
+
+            if (!order) {
+                alert('找不到該筆訂單明細！');
+                return;
+            }
+
+            document.getElementById('detail-order-id').innerText = order.orderId || orderId;
+            document.getElementById('detail-order-time').innerText = order.timestamp ? new Date(order.timestamp).toLocaleString('zh-TW', { hour12: false }) : '未知時間';
+            document.getElementById('detail-payment-total').innerText = `NT$ ${order.total.toLocaleString()}`;
+            document.getElementById('detail-payment-method').innerText = order.paymentMethod || '線上付款';
+            
+            const pmBadge = document.getElementById('detail-payment-method');
+            if (order.paymentMethod === '貨到付款') {
+                pmBadge.className = 'badge bg-success text-white';
+            } else if (order.paymentMethod === 'Line Pay') {
+                pmBadge.className = 'badge text-white';
+                pmBadge.style.backgroundColor = '#06c755';
+            } else {
+                pmBadge.className = 'badge bg-info text-dark';
+                pmBadge.style.backgroundColor = '';
+            }
+
+            const statusBadge = document.getElementById('detail-order-status');
+            const isCompleted = order.status === 'completed';
+            statusBadge.innerText = isCompleted ? '已出餐' : '準備中';
+            statusBadge.className = isCompleted ? 'badge bg-success' : 'badge bg-warning text-dark';
+
+            const tbody = document.getElementById('detail-items-body');
+            let itemsHtml = '';
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+
+            order.items.forEach(itemStr => {
+                const parsed = parseOrderItem(itemStr);
+                const p = findProductDetails(parsed.name);
+                
+                const img = p ? p.img : 'image/logo.jpeg';
+                let unitPrice = p ? p.price : 0;
+                if (p) {
+                    const promoPrice = statusSettings[p.name]?.promoPrice;
+                    if (promoPrice && promoPrice < p.price) {
+                        unitPrice = promoPrice;
+                    }
+                }
+                
+                const subtotal = unitPrice * parsed.qty;
+                
+                let specSpan = '';
+                if (parsed.specs) {
+                    specSpan = `<span class="badge bg-secondary text-white ms-1" style="font-size:0.75rem;">${parsed.specs}</span>`;
+                }
+
+                itemsHtml += `
+                    <tr>
+                        <td class="text-start ps-3">
+                            <div class="fw-bold text-dark fs-6">${parsed.name} ${specSpan}</div>
+                            ${parsed.code ? `<div class="text-muted small mt-1">${parsed.code}</div>` : ''}
+                        </td>
+                        <td>
+                            <img src="${img}" alt="${parsed.name}" class="details-img">
+                        </td>
+                        <td class="fw-bold text-primary">$${unitPrice}</td>
+                        <td class="fw-bold">${parsed.qty}</td>
+                        <td class="fw-bold text-danger">$${subtotal.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            let itemsSum = 0;
+            order.items.forEach(itemStr => {
+                const parsed = parseOrderItem(itemStr);
+                const p = findProductDetails(parsed.name);
+                let unitPrice = p ? p.price : 0;
+                if (p) {
+                    const promoPrice = statusSettings[p.name]?.promoPrice;
+                    if (promoPrice && promoPrice < p.price) {
+                        unitPrice = promoPrice;
+                    }
+                }
+                itemsSum += unitPrice * parsed.qty;
+            });
+
+            if (order.discount > 0 || itemsSum !== order.total) {
+                const discountVal = order.discount || (itemsSum - order.total);
+                if (discountVal > 0) {
+                    itemsHtml += `
+                        <tr class="table-light">
+                            <td colspan="4" class="text-end fw-bold">折扣</td>
+                            <td class="fw-bold text-success">-$${discountVal.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            itemsHtml += `
+                <tr class="table-light">
+                    <td colspan="4" class="text-end fw-bold fs-6">付款總額</td>
+                    <td class="fw-bold text-danger fs-6">$${order.total.toLocaleString()}</td>
+                </tr>
+            `;
+
+            tbody.innerHTML = itemsHtml;
+
+            document.getElementById('order-history-view').style.display = 'none';
+            document.getElementById('order-detail-view').style.display = 'block';
+        };
+
+        window.hideOrderDetail = function() {
+            document.getElementById('order-detail-view').style.display = 'none';
+            document.getElementById('order-history-view').style.display = 'block';
+        };
 
         document.getElementById('btn-logout').addEventListener('click', () => {
             if(confirm("確定要登出嗎？")) { 

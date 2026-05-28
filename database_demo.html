@@ -665,7 +665,13 @@
                 }
 
                 // 渲染訂單表格
-                const orderId = `ORD-2604-${String(1000 + originalIndex).substring(1)}`;
+                const orderDateStr = orderDate.getFullYear() + 
+                                     String(orderDate.getMonth() + 1).padStart(2, '0') + 
+                                     String(orderDate.getDate()).padStart(2, '0') +
+                                     String(orderDate.getHours()).padStart(2, '0') +
+                                     String(orderDate.getMinutes()).padStart(2, '0') +
+                                     String(orderDate.getSeconds()).padStart(2, '0');
+                const orderId = order.orderId || `ORD${orderDateStr}`;
                 const time = orderDate.toLocaleString('zh-TW');
                 const isCompleted = order.status === 'completed';
                 
@@ -686,12 +692,17 @@
                 const payId = `PAY-${order.timestamp.toString().substring(7)}`;
                 const shipId = `SHP-${order.timestamp.toString().substring(5)}`;
                 
+                const paymentMethodDisp = order.paymentMethod || '線上刷卡';
+                const paymentStatusBadge = paymentMethodDisp === '貨到付款'
+                    ? '<span class="status-badge status-pending">未付款 (貨到付款)</span>'
+                    : '<span class="status-badge status-success">已付款</span>';
+
                 paymentHtml += `<tr>
                     <td>${payId}</td>
                     <td>${orderId}</td>
-                    <td>線上刷卡</td>
+                    <td>${paymentMethodDisp}</td>
                     <td>NT$ ${order.total}</td>
-                    <td><span class="status-badge status-success">已付款</span></td>
+                    <td>${paymentStatusBadge}</td>
                 </tr>`;
 
                 const shipBadge = isCompleted 

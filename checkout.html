@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>結帳確認 - 得正 dejeng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(90deg, #48C9B0 0%, #1ABC9C 100%);
+            --header-gradient: linear-gradient(90deg, #48C9B0 0%, #a569bd 100%);
+            --details-gradient: linear-gradient(90deg, #d4ac0d 0%, #e74c3c 100%);
+            --brand-dark: #1C2B5A;
+            --brand-green: #27ae60;
+        }
+        body {
+            background: radial-gradient(circle at 10% 20%, rgba(224, 238, 250, 0.4) 0%, rgba(244, 246, 248, 1) 90.1%);
+            color: #334155;
+            font-family: 'Noto Sans TC', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: #B0E0E6 !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .brand-logo {
+            font-weight: bold;
+            color: #2F4F4F;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .brand-logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .main-content {
+            flex: 1;
+        }
+        
+        /* 結帳確認與明細橫幅 */
+        .section-banner {
+            background: linear-gradient(135deg, #48C9B0 0%, #16A085 100%);
+            color: white;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-align: center;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .section-banner.details {
+            background: linear-gradient(135deg, #F39C12 0%, #E74C3C 100%);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+        }
+
+        /* 結帳確認表格樣式 */
+        .checkout-summary-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 35px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            border-collapse: collapse;
+        }
+        .checkout-summary-table td {
+            padding: 15px 25px;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.1rem;
+        }
+        .checkout-summary-table tr:last-child td {
+            border-bottom: none;
+        }
+        .checkout-summary-table td:first-child {
+            font-weight: bold;
+            color: #64748b;
+            background: rgba(248, 250, 252, 0.6);
+            width: 45%;
+        }
+        .checkout-summary-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .checkout-summary-table tr:last-child td:last-child {
+            color: #e74c3c;
+            font-size: 1.35rem;
+        }
+
+        /* 訂單明細表格 */
+        .details-table-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            margin-bottom: 35px;
+        }
+        .details-table {
+            width: 100%;
+            margin-bottom: 0;
+            vertical-align: middle;
+            border-collapse: collapse;
+        }
+        .details-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: bold;
+            padding: 16px;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+        .details-table td {
+            padding: 20px 16px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+        .details-img {
+            width: 75px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+        .details-img:hover {
+            transform: scale(1.05);
+        }
+        .product-info-cell {
+            text-align: center;
+        }
+        .product-code {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        /* Checkbox styling */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .form-check-input {
+            width: 24px;
+            height: 24px;
+            margin-top: 0;
+            cursor: pointer;
+            box-shadow: none !important;
+        }
+        .form-check-input:checked {
+            background-color: #1ABC9C;
+            border-color: #1ABC9C;
+        }
+
+        /* Payment Selection Block */
+        .payment-section-box {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 650px;
+            margin: 0 auto 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+        .payment-option-label {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 600;
+            color: #475569;
+        }
+        .payment-option-label:hover {
+            border-color: #1ABC9C;
+            background: rgba(26, 188, 156, 0.02);
+            transform: translateY(-1px);
+        }
+        .payment-option-label.active {
+            border-color: #1ABC9C;
+            background: rgba(26, 188, 156, 0.04);
+            color: #16A085;
+            box-shadow: 0 4px 12px rgba(26, 188, 156, 0.1);
+        }
+        .payment-option-label input[type="radio"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #1ABC9C;
+        }
+        .payment-option-icon {
+            font-size: 1.3rem;
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Simulated Credit Card Form */
+        .cc-form-container {
+            border-top: 1px dashed #ddd;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .interactive-card-wrapper {
+            perspective: 1000px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+        }
+        .glass-credit-card {
+            width: 100%;
+            max-width: 380px;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+            background-color: #2c3e50;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-chip {
+            width: 40px;
+            height: 26px;
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+            border-radius: 6px;
+        }
+        .card-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-weight: 800;
+            font-style: italic;
+        }
+        .card-number {
+            font-size: 1.25rem;
+            font-family: monospace;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .card-info-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .card-label {
+            font-size: 0.65rem;
+            color: #bdc3c7;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .card-val {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Action Buttons */
+        .action-button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        .action-btn-row {
+            display: flex;
+            gap: 15px;
+        }
+        .btn-checkout-confirm {
+            background: var(--brand-green);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 1.15rem;
+            flex: 1;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        }
+        .btn-checkout-confirm:hover {
+            background: #219653;
+            transform: scale(1.02);
+        }
+        .btn-back-to-cart {
+            background: var(--brand-dark);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 1.15rem;
+            flex: 1;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn-back-to-cart:hover {
+            background: #121e42;
+            color: white;
+            transform: scale(1.02);
+        }
+        .btn-home-back {
+            border: 2px solid #5DADE2;
+            background: transparent;
+            color: #5DADE2;
+            border-radius: 50px;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            width: 100%;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        .btn-home-back:hover {
+            background: rgba(93, 173, 226, 0.05);
+            color: #3498db;
+            border-color: #3498db;
+        }
+
+        /* Line Pay scanner simulator */
+        .linepay-simulator {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8fafc;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .barcode-container {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            margin: 15px 0;
+            border: 2px solid #2ecc71;
+        }
+        .barcode-img {
+            max-width: 250px;
+            height: auto;
+        }
+        .scan-animation-line {
+            height: 3px;
+            background: #2ecc71;
+            box-shadow: 0 0 8px #2ecc71;
+            width: 100%;
+            animation: scan 2s linear infinite;
+            position: relative;
+        }
+        @keyframes scan {
+            0% { top: 0px; }
+            50% { top: 120px; }
+            100% { top: 0px; }
+        }
+
+        /* Loading / Processing screen Overlay */
+        .processing-overlay {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.95);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .processing-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .processing-spinner {
+            width: 70px;
+            height: 70px;
+            border: 6px solid rgba(26, 188, 156, 0.1);
+            border-top: 6px solid #1ABC9C;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 25px;
+        }
+        .processing-check {
+            width: 85px;
+            height: 85px;
+            background: #2ED573;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            box-shadow: 0 10px 20px rgba(46,213,115,0.3);
+            margin-bottom: 25px;
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .processing-check.visible {
+            transform: scale(1);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #E8F8F5 0%, #D1F2EB 100%);
+            padding: 3rem 2rem;
+            border-top: none;
+            margin-top: auto;
+        }
+        .footer-section h3 {
+            color: #2F4F4F;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 3px;
+            background: linear-gradient(90deg, #48C9B0, #1ABC9C);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light py-3">
+        <div class="container">
+            <a class="navbar-brand brand-logo fs-4" href="index.html">
+                <img src="image/logo.jpeg" alt="Logo"> 得正 dejeng
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="profile.html" id="user-display" class="badge bg-info text-dark px-3 py-2 text-decoration-none" style="display:none; font-size: 0.95rem;"></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content container py-5">
+        
+        <!-- 結帳確認 Banner -->
+        <div class="section-banner">
+            <i class="fa-solid fa-file-invoice-dollar fs-4"></i> 結帳確認
+        </div>
+
+        <!-- 結帳總金額摘要 -->
+        <table class="checkout-summary-table">
+            <tr>
+                <td>訂單金額</td>
+                <td style="color: #ff4757;">$<span id="summary-original-total">0</span></td>
+            </tr>
+            <tr>
+                <td>折扣</td>
+                <td style="color: #ff4757;">-$<span id="summary-discount">0</span></td>
+            </tr>
+            <tr>
+                <td>付款金額</td>
+                <td style="color: #ff4757; font-size: 1.3rem;">$<span id="summary-payment-total">0</span></td>
+            </tr>
+        </table>
+
+        <!-- 訂單明細 Banner -->
+        <div class="section-banner details">
+            <i class="fa-solid fa-list-ul fs-4"></i> 訂單明細
+        </div>
+
+        <!-- 訂單明細表格 -->
+        <div class="details-table-card table-responsive">
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">確認</th>
+                        <th style="text-align: center;">商品/商品編號</th>
+                        <th style="width: 120px;">圖片</th>
+                        <th style="width: 120px;">單價</th>
+                        <th style="width: 100px;">數量</th>
+                        <th style="width: 120px;">小計</th>
+                    </tr>
+                </thead>
+                <tbody id="checkout-items-body">
+                    <!-- 載入中 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 結帳付款方式區塊 -->
+        <div class="payment-section-box">
+            <h4 class="mb-4 fw-bold text-dark text-center"><i class="fa-solid fa-wallet text-info me-2"></i>選擇結帳方式</h4>
+            
+            <div class="payment-options">
+                <label class="payment-option-label" onclick="changePaymentMethod('credit-card')">
+                    <input type="radio" name="payment-method" id="pay-cc" value="信用卡付款" checked>
+                    <span class="payment-option-icon text-primary"><i class="fa-solid fa-credit-card"></i></span>
+                    <span>信用卡付款</span>
+                </label>
+                
+                <label class="payment-option-label" onclick="changePaymentMethod('cod')">
+                    <input type="radio" name="payment-method" id="pay-cod" value="貨到付款">
+                    <span class="payment-option-icon text-success"><i class="fa-solid fa-truck-ramp-box"></i></span>
+                    <span>貨到付款 (Cash on Delivery)</span>
+                </label>
+                
+                <label class="payment-option-label" onclick="changePaymentMethod('linepay')">
+                    <input type="radio" name="payment-method" id="pay-lp" value="Line Pay">
+                    <span class="payment-option-icon text-success"><i class="fa-brands fa-line" style="color: #06c755;"></i></span>
+                    <span>Line Pay 付款</span>
+                </label>
+            </div>
+
+            <!-- 信用卡付款模擬表單 -->
+            <div id="cc-details" class="cc-form-container">
+                <div class="interactive-card-wrapper">
+                    <div class="glass-credit-card">
+                        <div class="card-chip"></div>
+                        <div class="card-logo" id="preview-brand">VISA</div>
+                        <div class="card-number" id="preview-number">•••• •••• •••• ••••</div>
+                        <div class="card-info-row">
+                            <div>
+                                <div class="card-label">CARDHOLDER</div>
+                                <div class="card-val" id="preview-holder">YOUR NAME</div>
+                            </div>
+                            <div>
+                                <div class="card-label">EXPIRES</div>
+                                <div class="card-val" id="preview-expiry">MM/YY</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="checkout-cc-form" onsubmit="event.preventDefault();">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">信用卡卡號</label>
+                        <input type="text" id="cc-num-input" class="form-control form-control-lg" placeholder="4242 4242 4242 4242" maxlength="19" required oninput="formatCardNum(this)">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold text-muted small">到期日</label>
+                            <input type="text" id="cc-exp-input" class="form-control" placeholder="MM/YY" maxlength="5" required oninput="formatExpiry(this)">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold text-muted small">安全碼 (CVV)</label>
+                            <input type="text" id="cc-cvv-input" class="form-control" placeholder="123" maxlength="3" required oninput="this.value=this.value.replace(/\D/g,'')">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">持卡人姓名</label>
+                        <input type="text" id="cc-name-input" class="form-control" placeholder="YOUR NAME" required oninput="updateHolder(this)">
+                    </div>
+                </form>
+            </div>
+
+            <!-- 貨到付款說明 -->
+            <div id="cod-details" class="linepay-simulator text-start" style="display: none;">
+                <h5 class="fw-bold text-success"><i class="fa-solid fa-circle-check"></i> 貨到付款已選定</h5>
+                <p class="text-muted mb-0">當我們宅配人員將美味飲品或甜點送到您指定的地址時，請準備好相應的現金款項以供支付。免運費，安全無憂！</p>
+            </div>
+
+            <!-- Line Pay 條碼模擬 -->
+            <div id="linepay-details" class="linepay-simulator" style="display: none;">
+                <h5 class="fw-bold" style="color: #06c755;"><i class="fa-solid fa-qrcode"></i> 掃描條碼模擬付款</h5>
+                <p class="text-muted">請在 2 分鐘內使用手機掃描下方條碼進行付款</p>
+                <div class="barcode-container">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=dejeng-simulated-linepay-payment" alt="Scan QR Code" class="barcode-img">
+                    <div class="scan-animation-line"></div>
+                </div>
+                <div class="text-secondary small mt-2"><i class="fa-solid fa-spinner fa-spin"></i> 等待掃描感應中... (點選下方確定結帳直接模擬通過)</div>
+            </div>
+
+            <!-- 按鈕組 -->
+            <div class="action-button-group">
+                <div class="action-btn-row">
+                    <a href="cart.html" class="btn-back-to-cart"><i class="fa-solid fa-cart-shopping me-1"></i> 回購物車</a>
+                    <button class="btn-checkout-confirm" onclick="processCheckout()"><i class="fa-solid fa-check me-1"></i> 確定結帳</button>
+                </div>
+                <a href="index.html" class="btn-home-back"><i class="fa-solid fa-house me-1"></i> 回到首頁再看看</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 處理中/付款成功動畫 -->
+    <div id="loading-overlay" class="processing-overlay">
+        <div id="spinner-node" class="processing-spinner"></div>
+        <div id="check-node" class="processing-check"><i class="fa-solid fa-check"></i></div>
+        <h4 id="status-text" class="fw-bold text-dark text-center">正在安全處理交易中...</h4>
+        <p id="substatus-text" class="text-muted text-center">請勿關閉或重新整理此頁面</p>
+    </div>
+
+    <footer class="footer">
+        <div class="container text-center text-md-start">
+            <div class="row g-4">
+                <div class="col-md-6 footer-section">
+                    <h3>品牌資訊</h3>
+                    <p class="text-muted">得正 dejeng - 飲品 x 甜點 x 鮮果</p>
+                    <p class="text-muted">體驗最精緻的手作美味</p>
+                </div>
+                <div class="col-md-6 footer-section text-md-end">
+                    <h3>版權聲明</h3>
+                    <p class="text-muted">© 2026 得正 dejeng. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        
+        const firebaseConfig = { apiKey: "AIzaSyC-LcCfcPYCYAQZ7n45YCe6tCY_jb-ygvI", authDomain: "sonicboom-shop.firebaseapp.com", projectId: "sonicboom-shop", storageBucket: "sonicboom-shop.firebasestorage.app", messagingSenderId: "976804831944", appId: "1:976804831944:web:6ede6a95196478bd49bbfd", measurementId: "G-3FEKWL0QXZ" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        onAuthStateChanged(auth, (user) => {
+            const userDisplay = document.getElementById('user-display');
+            if (user) {
+                userDisplay.style.display = 'inline-block';
+                userDisplay.innerHTML = `<i class="fa-solid fa-user-check me-1"></i> 會員 ${user.displayName || user.email.split('@')[0]}`;
+            } else {
+                userDisplay.style.display = 'none';
+            }
+        });
+    </script>
+
+    <script>
+        const productsDB = {
+            "tea01": { name: "水之森玄米抹茶", price: 65, img: "image/01.jpg" },
+            "tea02": { name: "英倫伯爵紅茶", price: 55, img: "image/02.jpg" },
+            "tea03": { name: "珍珠鮮奶", price: 75, img: "image/03.jpg" },
+            "tea04": { name: "手炒黑糖鮮奶", price: 80, img: "image/04.jpg" },
+            "tea05": { name: "嫩仙草凍奶", price: 70, img: "image/05.jpg" },
+            "tea06": { name: "海鹽芒果綠", price: 65, img: "image/06.jpg" },
+            "tea07": { name: "琥珀高峰烏龍", price: 55, img: "image/07.jpg" },
+            "tea08": { name: "茉香綠茶拿鐵", price: 65, img: "image/08.jpg" },
+            "tea09": { name: "芋頭鮮奶", price: 85, img: "image/09.jpg" },
+            "tea10": { name: "果漾微甜氣泡飲", price: 75, img: "image/10.jpg" },
+            "tea11": { name: "經典冰水果茶", price: 80, img: "image/11.jpg" },
+            "tea12": { name: "季節限定特調", price: 85, img: "image/12.jpg" },
+            "tea13": { name: "招牌綜合果茶", price: 90, img: "image/13.jpg" },
+            "tea27": { name: "焙烏龍鮮奶", price: 70, img: "image/27.jpg" },
+            "tea28": { name: "柚見冰茶", price: 65, img: "image/28.jpg" },
+            "tea31": { name: "蜜桃春烏龍", price: 75, img: "image/31.jpg" },
+            "tea32": { name: "芝士奶蓋紅茶", price: 70, img: "image/32.jpg" },
+            "tea33": { name: "桂花烏龍凍飲", price: 65, img: "image/33.jpg" },
+            "donut01": { name: "蜜糖波堤", price: 45, img: "image/0001.jpg" },
+            "donut02": { name: "雙層巧克力波堤", price: 50, img: "image/0002.jpg" },
+            "donut03": { name: "草莓波堤", price: 50, img: "image/0003.jpg" },
+            "donut04": { name: "經典糖霜甜甜圈", price: 45, img: "image/0004.jpg" },
+            "donut05": { name: "巧克力脆片波堤", price: 55, img: "image/0005.jpg" },
+            "donut06": { name: "草莓夾心甜甜圈", price: 55, img: "image/0006.jpg" },
+            "donut07": { name: "抹茶巧貝", price: 55, img: "image/0007.jpg" },
+            "fruit01": { name: "鮮甜愛文芒果", price: 100, img: "image/S1.jpg" },
+            "fruit02": { name: "清香麻豆文旦", price: 80, img: "image/S2.jpg" },
+            "fruit03": { name: "活力陽光香蕉", price: 50, img: "image/S3.jpg" },
+            "fruit04": { name: "嚴選進口紅櫻桃", price: 150, img: "image/S4.jpg" },
+            "fruit05": { name: "清脆鮮切小黃瓜", price: 40, img: "image/S5.jpg" },
+            "fruit06": { name: "紐西蘭奇異果", price: 85, img: "image/S6.jpg" },
+            "fruit07": { name: "鮮甜多汁水蜜桃", price: 120, img: "image/unnamed.jpg" },
+            "fruit08": { name: "屏東金鑽鳳梨", price: 70, img: "image/unnamed (1).jpg" },
+            "fruit09": { name: "屏東黑珍珠蓮霧", price: 90, img: "image/unnamed (2).jpg" },
+            "fruit10": { name: "沁涼紅肉西瓜盤", price: 65, img: "image/unnamed (3).jpg" },
+            "fruit11": { name: "屏東無籽綠檸檬", price: 55, img: "image/unnamed (4).jpg" },
+            "fruit12": { name: "清脆甜水梨", price: 85, img: "image/unnamed (5).jpg" }
+        };
+
+        const productCodes = {
+            "tea01": "2026055001", "tea02": "2026055002", "tea03": "2026055003", "tea04": "2026055004", "tea05": "2026055005",
+            "tea06": "2026055006", "tea07": "2026055007", "tea08": "2026055008", "tea09": "2026055009", "tea10": "2026055010",
+            "tea11": "2026055011", "tea12": "2026055012", "tea13": "2026055013", "tea27": "2026055027", "tea28": "2026055015",
+            "tea31": "2026055031", "tea32": "2026055017", "tea33": "2026055018",
+            "donut01": "2026055101", "donut02": "2026055102", "donut03": "2026055103", "donut04": "2026055104", "donut05": "2026055105",
+            "donut06": "2026055106", "donut07": "2026055107",
+            "fruit01": "2026055201", "fruit02": "2026055202", "fruit03": "2026055203", "fruit04": "2026055204", "fruit05": "2026055205",
+            "fruit06": "2026055206", "fruit07": "2026055207", "fruit08": "2026055208", "fruit09": "2026055209", "fruit10": "2026055210",
+            "fruit11": "2026055211", "fruit12": "2026055212"
+        };
+
+        let cart = JSON.parse(localStorage.getItem('dejeng_cart')) || [];
+        // Keep track of which items are checked. Default all to true.
+        let checkedStates = cart.map(() => true); 
+
+        function renderCheckoutItems() {
+            const tbody = document.getElementById('checkout-items-body');
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            
+            if (cart.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-5 text-center text-muted fs-5">購物車目前沒有商品喔！</td></tr>`;
+                updateSummary(0, 0, 0);
+                return;
+            }
+
+            let html = '';
+            cart.forEach((item, index) => {
+                const p = productsDB[item.id];
+                if (!p) return;
+                
+                const pCode = productCodes[item.id] || "202605" + String(index).padStart(4, '0');
+                const promoPrice = statusSettings[p.name]?.promoPrice;
+                const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
+                const subtotal = currentPrice * item.qty;
+
+                const isChecked = checkedStates[index] ? 'checked' : '';
+                
+                let specText = '';
+                if (item.sugar !== '--' && item.ice !== '--') {
+                    specText = `<span class="badge bg-secondary text-white ms-2" style="font-size:0.75rem;">${item.sugar} / ${item.ice}</span>`;
+                }
+
+                html += `
+                <tr>
+                    <td class="checkbox-container">
+                        <input type="checkbox" class="form-check-input confirm-checkbox" ${isChecked} onchange="toggleItem(${index}, this.checked)">
+                    </td>
+                    <td class="product-info-cell">
+                        <div class="fw-bold text-dark fs-6">${p.name} ${specText}</div>
+                        <div class="text-muted small mt-1">${pCode}</div>
+                    </td>
+                    <td>
+                        <img src="${p.img}" alt="${p.name}" class="details-img">
+                    </td>
+                    <td class="fw-bold text-primary">
+                        $${currentPrice}
+                    </td>
+                    <td class="fw-bold">${item.qty} 份</td>
+                    <td class="fw-bold text-danger">
+                        $${subtotal.toLocaleString()}
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+            recalculateSummary();
+        }
+
+        window.toggleItem = function(index, isChecked) {
+            checkedStates[index] = isChecked;
+            recalculateSummary();
+        };
+
+        function recalculateSummary() {
+            let originalTotal = 0;
+            let paymentTotal = 0;
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+
+            cart.forEach((item, index) => {
+                if (!checkedStates[index]) return; // Skip unchecked items
+                
+                const p = productsDB[item.id];
+                if (!p) return;
+
+                const promoPrice = statusSettings[p.name]?.promoPrice;
+                const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
+
+                originalTotal += p.price * item.qty;
+                paymentTotal += currentPrice * item.qty;
+            });
+
+            const discount = originalTotal - paymentTotal;
+            updateSummary(originalTotal, discount, paymentTotal);
+        }
+
+        function updateSummary(orig, disc, pay) {
+            document.getElementById('summary-original-total').innerText = orig.toLocaleString();
+            document.getElementById('summary-discount').innerText = disc.toLocaleString();
+            document.getElementById('summary-payment-total').innerText = pay.toLocaleString();
+        }
+
+        window.changePaymentMethod = function(method) {
+            const cc = document.getElementById('cc-details');
+            const cod = document.getElementById('cod-details');
+            const lp = document.getElementById('linepay-details');
+            
+            cc.style.display = 'none';
+            cod.style.display = 'none';
+            lp.style.display = 'none';
+
+            document.querySelectorAll('.payment-option-label').forEach(label => {
+                label.classList.remove('active');
+            });
+
+            if (method === 'credit-card') {
+                cc.style.display = 'block';
+                document.getElementById('pay-cc').checked = true;
+                document.getElementById('pay-cc').closest('.payment-option-label').classList.add('active');
+            } else if (method === 'cod') {
+                cod.style.display = 'block';
+                document.getElementById('pay-cod').checked = true;
+                document.getElementById('pay-cod').closest('.payment-option-label').classList.add('active');
+            } else if (method === 'linepay') {
+                lp.style.display = 'block';
+                document.getElementById('pay-lp').checked = true;
+                document.getElementById('pay-lp').closest('.payment-option-label').classList.add('active');
+            }
+        };
+
+        // Format Credit Card input values
+        window.formatCardNum = function(input) {
+            let val = input.value.replace(/\D/g, '');
+            let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+            input.value = formatted;
+            document.getElementById('preview-number').innerText = formatted || '•••• •••• •••• ••••';
+            
+            // Brand detection
+            const logo = document.getElementById('preview-brand');
+            if (val.startsWith('4')) logo.innerText = 'VISA';
+            else if (val.startsWith('5')) logo.innerText = 'Mastercard';
+            else if (val.startsWith('3')) logo.innerText = 'AMEX';
+            else logo.innerText = 'VISA';
+        };
+
+        window.formatExpiry = function(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length >= 2) {
+                val = val.substring(0, 2) + '/' + val.substring(2);
+            }
+            input.value = val;
+            document.getElementById('preview-expiry').innerText = val || 'MM/YY';
+        };
+
+        window.updateHolder = function(input) {
+            document.getElementById('preview-holder').innerText = input.value.toUpperCase() || 'YOUR NAME';
+        };
+
+        // Finalize transaction
+        window.processCheckout = function() {
+            // Count checked items
+            const checkedCount = checkedStates.filter(s => s).length;
+            if (checkedCount === 0) {
+                alert('請至少選擇一項商品進行結帳！');
+                return;
+            }
+
+            // Get selected payment method
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+            // Validate credit card form if selected
+            if (paymentMethod === '信用卡付款') {
+                const num = document.getElementById('cc-num-input').value;
+                const exp = document.getElementById('cc-exp-input').value;
+                const cvv = document.getElementById('cc-cvv-input').value;
+                const name = document.getElementById('cc-name-input').value;
+
+                if (!num || !exp || !cvv || !name || num.length < 15) {
+                    alert('請填寫完整且正確的信用卡資訊！');
+                    return;
+                }
+            }
+
+            // Show simulated loader screen
+            const overlay = document.getElementById('loading-overlay');
+            const spinner = document.getElementById('spinner-node');
+            const check = document.getElementById('check-node');
+            const title = document.getElementById('status-text');
+            const sub = document.getElementById('substatus-text');
+
+            overlay.classList.add('active');
+            spinner.style.display = 'block';
+            check.classList.remove('visible');
+            title.innerText = paymentMethod === '信用卡付款' ? "正在進行信用卡授權..." : 
+                            paymentMethod === 'Line Pay' ? "正在進行 Line Pay 付款驗證..." : 
+                            "正在為您處理貨到付款訂單...";
+            sub.innerText = "請稍候，安全交易處理中...";
+
+            setTimeout(() => {
+                // Change to success
+                spinner.style.display = 'none';
+                check.classList.add('visible');
+                title.innerText = "交易付款完成！";
+                title.style.color = '#2ED573';
+                sub.innerText = "訂單成立成功，正在為您導向至評分系統...";
+
+                setTimeout(() => {
+                    finalizeOrder(paymentMethod);
+                }, 1500);
+            }, 2500);
+        };
+
+        function finalizeOrder(method) {
+            const statusSettings = JSON.parse(localStorage.getItem('dejeng_product_settings')) || {};
+            
+            // Build items to purchase and items to keep in cart
+            let purchasedItemsList = [];
+            let updatedCart = [];
+            let purchasedTotal = 0;
+            let purchasedOriginalTotal = 0;
+
+            cart.forEach((item, index) => {
+                const p = productsDB[item.id];
+                if (!p) return;
+
+                if (checkedStates[index]) {
+                    // Purchase item
+                    const pCode = productCodes[item.id] || "202605" + String(index).padStart(4, '0');
+                    const spec = (item.sugar !== '--' && item.ice !== '--') 
+                        ? ` (${pCode}/${item.sugar}/${item.ice})` 
+                        : ` (${pCode})`;
+                    purchasedItemsList.push(`${p.name}${spec} x${item.qty}`);
+                    
+                    const promoPrice = statusSettings[p.name]?.promoPrice;
+                    const currentPrice = (promoPrice && promoPrice < p.price) ? promoPrice : p.price;
+                    purchasedTotal += currentPrice * item.qty;
+                    purchasedOriginalTotal += p.price * item.qty;
+                } else {
+                    // Keep in cart
+                    updatedCart.push(item);
+                }
+            });
+
+            // Get customer display name
+            const currentUserStr = document.getElementById('user-display').innerText || '';
+            let customerName = "訪客 (前台購買)";
+            if (currentUserStr.includes('會員')) {
+                customerName = currentUserStr.replace('會員', '').trim();
+            }
+
+            // Generate unique sequential serial number (流水號): ORD + YmdHis
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            const date = new Date();
+            const dateStr = date.getFullYear() + 
+                            String(date.getMonth() + 1).padStart(2, '0') + 
+                            String(date.getDate()).padStart(2, '0') +
+                            String(date.getHours()).padStart(2, '0') +
+                            String(date.getMinutes()).padStart(2, '0') +
+                            String(date.getSeconds()).padStart(2, '0');
+            const orderId = `ORD${dateStr}`;
+
+            const newOrder = {
+                orderId: orderId,
+                total: purchasedTotal,
+                originalTotal: purchasedOriginalTotal,
+                discount: purchasedOriginalTotal - purchasedTotal,
+                items: purchasedItemsList,
+                itemsCount: checkedStates.filter(s => s).length,
+                customer: customerName,
+                paymentMethod: method,
+                timestamp: new Date().getTime(),
+                status: 'pending' // default production status
+            };
+
+            orders.push(newOrder);
+            localStorage.setItem('dejeng_orders', JSON.stringify(orders));
+
+            // Save leftover items back to cart
+            localStorage.setItem('dejeng_cart', JSON.stringify(updatedCart));
+
+            // Redirect
+            window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName);
+        }
+
+        // Initialize Page
+        renderCheckoutItems();
+        
+        // Setup initial display
+        changePaymentMethod('credit-card');
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
