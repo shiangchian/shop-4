@@ -984,7 +984,7 @@
             localStorage.setItem('dejeng_cart', JSON.stringify(updatedCart));
 
             // Redirect
-            window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName);
+            window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName) + "&orderId=" + encodeURIComponent(orderId);
         }
 
         // Initialize Page
