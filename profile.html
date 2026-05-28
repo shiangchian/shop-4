@@ -112,6 +112,13 @@
                 font-size: 0.85rem;
                 gap: 5px;
             }
+            .profile-container {
+                padding: 20px 15px !important;
+                border-radius: 16px !important;
+            }
+            .order-card .card-body {
+                padding: 15px !important;
+            }
         }
         
         .profile-container {
@@ -317,7 +324,7 @@
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3">
                                 <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-info-circle text-info me-1"></i>訂單資訊</h5>
-                                <div class="mb-2"><strong>訂單流水號：</strong><span id="detail-order-id" class="badge bg-secondary text-white" style="font-size:0.95rem;">ORD...</span></div>
+                                <div class="mb-2"><strong>訂單流水號：</strong><span id="detail-order-id" class="badge bg-secondary text-white text-start" style="font-size:0.95rem; white-space: normal; display: inline-block; word-break: break-all;">ORD...</span></div>
                                 <div><strong>建立時間：</strong><span id="detail-order-time" class="text-muted">2026-05-28 12:00:00</span></div>
                             </div>
                             <div class="col-md-6 mb-3 text-md-end">
@@ -440,14 +447,14 @@
                 html += `
                     <div class="card border-0 shadow-sm mb-3 order-card" style="border-radius: 15px; overflow: hidden; background: #fafbfc; animation-delay: ${index * 0.08}s;">
                         <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
                                 <div>
                                     <span class="text-muted small d-block mb-1"><i class="fa-regular fa-clock me-1"></i>${dateStr}</span>
-                                    <span class="badge rounded-pill" style="font-size: 0.8rem; background-color: #E8F8F5; color: #117A65; padding: 4px 10px;">訂單流水號：${serialNo}</span>
+                                    <span class="badge rounded-pill text-start" style="font-size: 0.8rem; background-color: #E8F8F5; color: #117A65; padding: 4px 10px; white-space: normal; display: inline-block; word-break: break-all;">訂單流水號：${serialNo}</span>
                                 </div>
-                                <div class="text-end">
+                                <div class="text-start text-sm-end mt-1 mt-sm-0">
                                     <span class="text-muted small d-block">消費金額</span>
-                                    <span class="fw-bold text-primary" style="font-size: 1.25rem;">NT$ ${order.total}</span>
+                                    <span class="fw-bold text-primary" style="font-size: 1.25rem; white-space: nowrap;">NT$ ${order.total}</span>
                                 </div>
                             </div>
                             <ul class="list-group list-group-flush mb-0 pt-2 border-top border-light-subtle">

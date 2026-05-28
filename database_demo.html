@@ -348,24 +348,6 @@
                     <!-- 動態產生 -->
                 </ul>
             </div>
-            
-            <!-- 顧客評價與數據分析 -->
-            <div class="list-card">
-                <div class="card-header-title">
-                    <span><i class="fa-solid fa-comments text-success me-2"></i> 顧客評價與數據分析</span>
-                    <span class="badge bg-success" style="font-size:0.8rem; font-weight:normal;">最新評價</span>
-                </div>
-                <div id="reviews-summary" style="text-align: center; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 2.5rem; font-weight: 800; color: #2F4F4F;" id="review-avg">0.0</h3>
-                    <div style="color: #FFD700; font-size: 1.2rem;" id="review-stars-avg">
-                        <i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i>
-                    </div>
-                    <p style="color: #7A7775; font-size: 0.9rem; margin-top: 5px;" id="review-count">共 0 則評價</p>
-                </div>
-                <ul class="alert-list" id="reviews-list" style="max-height: 200px;">
-                    <!-- 動態產生 -->
-                </ul>
-            </div>
         </div>
 
         <!-- 訂單管理 -->
@@ -792,53 +774,8 @@
             const chartData = past30Days.map(date => dailyRevenue[date]);
             renderChart(past30Days, chartData);
             
-            // 處理顧客評價
-            renderReviews();
-            
             // 處理產品上下架機制 (動態加入按鈕與背景)
             renderProductTableStatus();
-        }
-        
-        function renderReviews() {
-            const reviews = JSON.parse(localStorage.getItem('dejeng_reviews')) || [];
-            let avgRating = 0;
-            let html = '';
-            
-            if(reviews.length > 0) {
-                const totalStars = reviews.reduce((sum, r) => sum + r.rating, 0);
-                avgRating = (totalStars / reviews.length).toFixed(1);
-                
-                // 渲染星星
-                let starsHtml = '';
-                for(let i=1; i<=5; i++) {
-                    if(i <= Math.round(avgRating)) starsHtml += '<i class="fa-solid fa-star"></i>';
-                    else starsHtml += '<i class="fa-regular fa-star"></i>';
-                }
-                document.getElementById('review-stars-avg').innerHTML = starsHtml;
-                document.getElementById('review-avg').innerText = avgRating;
-                document.getElementById('review-count').innerText = `共 ${reviews.length} 則評價`;
-                
-                reviews.slice().reverse().forEach(r => {
-                    let rStars = '';
-                    for(let i=1; i<=5; i++) {
-                        rStars += i <= r.rating ? '<i class="fa-solid fa-star text-warning"></i>' : '<i class="fa-regular fa-star text-muted"></i>';
-                    }
-                    html += `
-                        <li class="alert-item" style="flex-direction: column; align-items: flex-start;">
-                            <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
-                                <span style="font-weight:bold;"><i class="fa-solid fa-user-circle text-info"></i> ${r.name}</span>
-                                <span>${rStars}</span>
-                            </div>
-                            <div style="color: #555; font-size: 0.9rem; background: rgba(28,43,90,0.05); padding: 8px; border-radius: 8px; width:100%;">
-                                ${r.comment || '無留言'}
-                            </div>
-                        </li>
-                    `;
-                });
-            } else {
-                html = '<li style="text-align:center; padding: 20px; color:var(--text-muted);">目前尚無評價。</li>';
-            }
-            document.getElementById('reviews-list').innerHTML = html;
         }
 
         function renderProductTableStatus() {
