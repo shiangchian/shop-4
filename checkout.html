@@ -747,13 +747,22 @@
                     specText = `<span class="badge bg-secondary text-white ms-2" style="font-size:0.75rem;">${item.sugar} / ${item.ice}</span>`;
                 }
 
+                const inventory = syncInventory();
+                const stockVal = inventory[p.name] !== undefined ? inventory[p.name] : 100;
+                let stockWarning = '';
+                if (stockVal <= 0) {
+                    stockWarning = `<span class="badge bg-danger text-white ms-2" style="font-size:0.75rem;">已完售</span>`;
+                } else if (item.qty > stockVal) {
+                    stockWarning = `<span class="badge bg-warning text-dark ms-2" style="font-size:0.75rem;">庫存不足 (剩 ${stockVal})</span>`;
+                }
+
                 html += `
                 <tr>
                     <td class="checkbox-container">
                         <input type="checkbox" class="form-check-input confirm-checkbox" ${isChecked} onchange="toggleItem(${index}, this.checked)">
                     </td>
                     <td class="product-info-cell">
-                        <div class="fw-bold text-dark fs-6">${p.name} ${specText}</div>
+                        <div class="fw-bold text-dark fs-6">${p.name} ${specText}${stockWarning}</div>
                         <div class="text-muted small mt-1">${pCode}</div>
                     </td>
                     <td>
@@ -868,6 +877,27 @@
             if (checkedCount === 0) {
                 alert('請至少選擇一項商品進行結帳！');
                 return;
+            }
+
+            // Verify stock for checked items
+            const inventory = syncInventory();
+            for (let i = 0; i < cart.length; i++) {
+                if (checkedStates[i]) {
+                    const item = cart[i];
+                    const p = productsDB[item.id];
+                    if (!p) continue;
+                    const stock = inventory[p.name] !== undefined ? inventory[p.name] : 100;
+                    if (stock <= 0) {
+                        alert(`抱歉，您選擇的商品【${p.name}】已無庫存，無法完成交易！`);
+                        renderCheckoutItems();
+                        return;
+                    }
+                    if (item.qty > stock) {
+                        alert(`抱歉，您選擇的商品【${p.name}】庫存不足（僅剩 ${stock} 件），請回購物車修改數量或取消選擇！`);
+                        renderCheckoutItems();
+                        return;
+                    }
+                }
             }
 
             // Get selected payment method
@@ -985,6 +1015,65 @@
 
             // Redirect
             window.location.href = "success.html?type=checkout&name=" + encodeURIComponent(customerName) + "&orderId=" + encodeURIComponent(orderId);
+        }
+
+        function syncInventory() {
+            let baseInventory = JSON.parse(localStorage.getItem('dejeng_base_inventory')) || {};
+            let baseInvUpdated = false;
+            
+            const allProducts = [
+                "水之森玄米抹茶", "英倫伯爵紅茶", "珍珠鮮奶", "手炒黑糖鮮奶", "嫩仙草凍奶", 
+                "海鹽芒果綠", "琥珀高峰烏龍", "茉香綠茶拿鐵", "芋頭鮮奶", "果漾微甜氣泡飲", 
+                "經典冰水果茶", "季節限定特調", "招牌綜合果茶", "焙烏龍鮮奶", "柚見冰茶", 
+                "蜜桃春烏龍", "芝士奶蓋紅茶", "桂花烏龍凍飲", "蜜糖波堤", "雙層巧克力波堤", 
+                "草莓波堤", "經典糖霜甜甜圈", "巧克力脆片波堤", "草莓夾心甜甜圈", "抹茶巧貝", 
+                "鮮甜愛文芒果", "清香麻豆文旦", "活力陽光香蕉", "嚴選進口紅櫻桃", "清脆鮮切小黃瓜", 
+                "紐西蘭奇異果", "鮮甜多汁水蜜桃", "屏東金鑽鳳梨", "屏東黑珍珠蓮霧", "沁涼紅肉西瓜盤", 
+                "屏東無籽綠檸檬", "清脆甜水梨"
+            ];
+            
+            allProducts.forEach(name => {
+                if (baseInventory[name] === undefined) {
+                    baseInventory[name] = Math.floor(Math.random() * 101) + 20; // 隨機庫存 20-120
+                    baseInvUpdated = true;
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            const orders = JSON.parse(localStorage.getItem('dejeng_orders')) || [];
+            const computedInventory = {};
+            for (let name in baseInventory) {
+                computedInventory[name] = baseInventory[name];
+            }
+            
+            orders.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(itemStr => {
+                        const match = itemStr.match(/(.*?)(?:\s*\(.*?\))?\s*x(\d+)/);
+                        if (match) {
+                            const pName = match[1].trim();
+                            const pQty = parseInt(match[2]);
+                            if (computedInventory[pName] !== undefined) {
+                                computedInventory[pName] -= pQty;
+                            } else {
+                                baseInventory[pName] = Math.floor(Math.random() * 101) + 20;
+                                baseInvUpdated = true;
+                                computedInventory[pName] = baseInventory[pName] - pQty;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (baseInvUpdated) {
+                localStorage.setItem('dejeng_base_inventory', JSON.stringify(baseInventory));
+            }
+            
+            localStorage.setItem('dejeng_computed_inventory', JSON.stringify(computedInventory));
+            return computedInventory;
         }
 
         // Initialize Page

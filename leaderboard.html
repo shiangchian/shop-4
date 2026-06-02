@@ -391,7 +391,34 @@
             let defIce = itemId.startsWith('tea') ? '正常冰' : '--';
             let alertMsg = itemId.startsWith('tea') ? '(預設正常糖、正常冰)' : '';
 
+            // Find product name in DOM
+            let pName = "";
+            const cards = document.querySelectorAll('.rank-card');
+            for (let card of cards) {
+                const btn = card.querySelector('.btn-cart');
+                if (btn) {
+                    const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+                    if (match && match[1] === itemId) {
+                        const nameNode = card.querySelector('.rank-name');
+                        if (nameNode) {
+                            pName = nameNode.innerText.trim();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Verify stock
+            const inventory = syncInventory();
+            const stock = (pName && inventory[pName] !== undefined) ? inventory[pName] : 100;
             const existingIndex = cart.findIndex(item => item.id === itemId && item.sugar === defSugar && item.ice === defIce);
+            let currentQtyInCart = existingIndex > -1 ? cart[existingIndex].qty : 0;
+            
+            if (currentQtyInCart + 1 > stock) {
+                alert(`抱歉，【${pName || itemId}】已無足夠庫存！目前庫存剩餘 ${stock} 件，您的購物車中已有 ${currentQtyInCart} 件。`);
+                return;
+            }
+
             if (existingIndex > -1) { cart[existingIndex].qty += 1; } 
             else { cart.push({ id: itemId, qty: 1, sugar: defSugar, ice: defIce }); }
             
